@@ -1,0 +1,1471 @@
+---
+title: "Ec140 - Variance and Sampling"
+author: "Fernando Hoces la Guardia"
+date: "06/27/2022"
+output: 
+  xaringan::moon_reader:
+    footer: "These slides available at https://fhoces.github.io/econ140summer2022/"
+    css: [default, metropolis, metropolis-fonts] 
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+.remark-slide-content {
+    font-size: 30px;
+    padding: 1em 1em 1em 1em;
+}
+</style>
+
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, parallel, Ecdat, wooldridge, dslabs, ggforce)
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Notes directory
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+```
+
+# Housekeeping 
+
+- Updated Syllabus
+  - Fixed dates on PS1. Due this Friday 5pm on gradescope. 
+  
+- Unofficial Course Capture! (second attempt!)
+
+- Finish Ch 1 of MM by the end of the week. 
+
+
+
+
+---
+count:true
+
+# Todays Lecture 
+
+- Variance and Standard Deviation
+
+- Expectation and Standard Deviation of the Sample Mean
+
+- Law of Large Numbers, Central Limit Theorem, and Sampling
+
+
+---
+count:true
+
+# Variance and Standard Deviation 1/N (Sample)
+
+.font80[
+.pull-left[
+- Random variables -> probabilities -> distributions -> data -> mean/expectation
+
+- Let's look at another data set:  
+
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+# Generate data
+df <- data.frame(
+  moc_se = 1:8,
+  hp =  c(81,83,90,88,78,83,77, 96) ,
+  got = c(90, 96, 96, 97, 93, 94, 93, 55) # draw integers
+)
+
+```
+
+
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df
+colnames(df_tab) <- c("\\(i\\)", "Harry Potter Movies (\\(X\\))", "Game of Thrones Seasons (\\(Y\\))")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+]
+
+]
+
+---
+count:true
+
+# Variance and Standard Deviation 1/N (Sample)
+.font80[
+.pull-left[
+- Random variables -> probabilities -> distributions -> data -> mean/expectation
+
+- Let's look at another data set:  
+
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+# Generate data
+df <- data.frame(
+  moc_se = 1:8,
+  hp =  c(81,83,90,88,78,83,77, 96) ,
+  got = c(90, 96, 96, 97, 93, 94, 93, 55) # draw integers
+)
+
+```
+
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+- Based on this data set, which one should we watch?
+
+- In addition to the mean, what other summary statistic (from data to one number) would you like to communicate. 
+
+- Lets draw the data
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df
+colnames(df_tab) <- c("\\(i\\)", "Harry Potter Movies (\\(X\\))", "Game of Thrones Seasons (\\(Y\\))")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+]
+
+]
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+]
+
+]
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df
+colnames(df_tab) <- c("\\(i\\)", "Harry Potter Movies (\\(X\\))", "Game of Thrones Seasons (\\(Y\\))")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+]
+
+]
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df <- df %>% mutate(dis_hp = hp - mean(hp), 
+                    dis_got = got - mean(got))
+
+
+```
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+]
+
+]
+
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, got, dis_got))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)",  
+                      "\\(Y\\)",  "\\(Y - \\overline{Y}\\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+
+]
+
+]
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, got, dis_got))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)",  
+                      "\\(Y\\)",  "\\(Y - \\overline{Y}\\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+
+]
+
+]
+
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1)` \\
+\overline{Y} = `r round(mean(df$got),1)`
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = ? \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = ?
+\end{equation}
+$$
+
+]
+
+]
+
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, got, dis_got))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)",  
+                      "\\(Y\\)",  "\\(Y - \\overline{Y}\\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+
+]
+
+]
+
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+
+$$
+\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = `r round(mean(df$dis_hp),1) ` \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = `r round(mean(df$dis_got),1) `
+\end{equation}
+$$
+
+]
+
+]
+
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = `r round(mean(df$dis_hp),1) ` \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = `r round(mean(df$dis_got),1) `
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df <- df %>% mutate(dis_hp_2 = dis_hp^2 , 
+                    dis_got_2 = dis_got^2)
+
+
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, dis_hp_2, got, dis_got, dis_got_2))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)", 
+                      "\\( (X - \\overline{X})^2 \\)",  "\\(Y\\)",  "
+                      \\(Y - \\overline{Y}\\)", "\\( (X - \\overline{X})^2 \\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = `r round(mean(df$dis_hp),1) ` \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = `r round(mean(df$dis_got),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(mean(df$dis_hp_2),1) ` \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} = `r round(mean(df$dis_got_2),1) `
+\end{equation}
+$$
+
+
+
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, dis_hp_2, got, dis_got, dis_got_2))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)", 
+                      "\\( (X - \\overline{X})^2 \\)",  "\\(Y\\)",  "
+                      \\(Y - \\overline{Y}\\)", "\\( (X - \\overline{X})^2 \\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+.font150[
+
+- These represent the sample variances of HP and GoT ratings
+- But what about the units?
+
+]
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(mean(df$dis_hp_2),1) ` \\
+s^{2}_{Y} = \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} = `r round(mean(df$dis_got_2),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s_{X} = \sqrt{ \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} } = `r round(sqrt( mean(df$dis_hp_2) ),1) ` \\
+s_{Y} = \sqrt{ \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} } = `r round(sqrt( mean(df$dis_got_2) ),1) `
+\end{equation}
+$$
+
+
+
+
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, dis_hp_2, got, dis_got, dis_got_2))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)", 
+                      "\\( (X - \\overline{X})^2 \\)",  "\\(Y\\)",  "
+                      \\(Y - \\overline{Y}\\)", "\\( (X - \\overline{X})^2 \\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+.font150[
+- Due to a minor technicality we divide by $N-1$ instead of $N$ (not relevant for the course).
+- $s^{2}_{X}$ and $s_{X}$ correspond to the sample variance and sample standard deviation of a random variable $X$.
+
+]
+]
+
+]
+
+---
+count: true
+# Variance and Standard Deviation 2/N (Sample)
+
+.font80[
+.pull-left[
+
+$$
+\begin{equation}
+\overline{X} = `r round(mean(df$hp),1) ` \\
+\overline{Y} = `r round(mean(df$got),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8- 1} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  - 1 ),1) ` \\
+s^{2}_{Y} = \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8 - 1} = `r round(sum(df$dis_got_2) / ( length(df$dis_got_2)  - 1 ),1) `
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s_{X} = \sqrt{ \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8 - 1} } = `r round(sqrt( sum(df$dis_hp_2) / ( length(df$dis_hp_2)  - 1 ) ),1) ` \\
+s_{Y} = \sqrt{ \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8 - 1} } = `r round(sqrt( sum(df$dis_got_2) / ( length(df$dis_got_2)  - 1 ) ),1) `
+\end{equation}
+$$
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+
+df_tab <- df %>% select(c(moc_se, hp, dis_hp, dis_hp_2, got, dis_got, dis_got_2))
+
+colnames(df_tab) <- c("\\(i\\)", "\\(X\\)",  "\\(X - \\overline{X}\\)", 
+                      "\\( (X - \\overline{X})^2 \\)",  "\\(Y\\)",  "
+                      \\(Y - \\overline{Y}\\)", "\\( (X - \\overline{X})^2 \\)")
+
+df_tab %>% DT::datatable(caption = "Rotten Tomatos Scores", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+
+
+.font150[
+- Due to a minor technicality we divide by $N-1$ instead of $N$ (not relevant for the course).
+- $s^{2}_{X}$ and $s_{X}$ correspond to the sample variance and standard deviation.
+
+]
+
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 3/N (Population)
+
+Let's focus on the formula for mean and sample variance of Harry Potter only. And for now, I will continue use $N$ (8) in the denominator for the variane to illustrate the following concept.  
+
+
+
+.font90[
+.pull-left[
+
+$$
+\begin{equation}
+ \overline{X} = \frac{ \sum_{1:8}{x} }{8} = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2) ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+]
+
+]
+
+
+
+
+
+---
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{  \overline{X} = \frac{ \sum_{1:8}{x} }{8} } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+
+]
+
+]
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+]
+
+]
+
+
+
+---
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+     \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8}   
+ } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+
+]
+
+]
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}
+$$
+
+
+
+]
+
+]
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} 
+} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}
+$$
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = `r round(mean(df$hp),1) ` \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} = \frac{ \sum_{1:8} g(x) }{8} 
+} = `r round(sum(df$dis_hp_2) / ( length(df$dis_hp_2)  ),1) ` \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}
+$$
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} =  \frac{ \sum_{1:8}{g(x)} }{8} = \sum_{1:8} g(x)  \frac{1}{8} = \\   \sum_{1:8} g(x) \times prop(x) 
+}  \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+--
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( g(x) \right)  = \\
+  \mathop{\mathbb{E}}\left( (X - \overline{X})^2 \right) = \sum_{x} (x - E(X))^2 f(x)
+  }\\
+\end{equation}
+$$
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } \\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} =  \frac{ \sum_{1:8}{g(x)} }{8} = \sum_{1:8} g(x)  \frac{1}{8} = \\   \sum_{1:8} g(x) \times prop(x) 
+}  \\
+\end{equation}
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}
+$$
+
+
+$$
+\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( g(x) \right)  = \\
+  \mathop{\mathbb{E}}\left( (X - E(X))^2 \right) = \sum_{x} (x - E(X))^2 f(x)
+  }\\
+\end{equation}
+$$
+Usually $E(X)$ is defined as $\mu$, so you might see: 
+
+$$
+\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) = \sum_{x} (x - \mu)^2 f(x)
+  }\\
+\end{equation}
+$$
+
+]
+
+]
+
+---
+count:true
+# Variance and Standard Deviation 5/N (Done!)
+You now know what are the variance and standard deviation and where do they come from!
+
+.font200[
+
+$$
+\begin{equation}
+  Var(X)  = \sigma^2 = \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) \\
+  SD(X)  =  \sigma = \sqrt{ \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) }
+\end{equation}
+$$
+
+]
+
+---
+# Variance
+
+Random variables $\color{#e64173}{X}$ and $\color{#9370DB}{Y}$ share the same population mean, but are distributed differently.
+
+```{R, echo = F, dev = "svg", fig.height = 4}
+df <- tibble(x = seq(-4, 4, 0.01), 
+             y = dnorm(x),
+             z = dnorm(x, sd = 0.4)) %>%
+  rbind(., tibble(x = seq(4, -4, -0.01), y = 0, z = 0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 1.1), expand=c(0,0), breaks = c(0, 0.5, 1), labels = c(0, 0.5, 1)) +
+  geom_polygon(data = df, aes(x, y), fill = "#e64173", alpha = 0.5) +
+  geom_polygon(data = df, aes(x, z), fill = "#9370DB", alpha = 0.5) +
+  geom_vline(xintercept = 0, size = 1) +
+  #geom_polygon(data = df %>% filter(x <= qnorm(0.5 + 0.475) & x >= qnorm(0.5 - 0.475)), aes(x, y), fill = red_pink) +
+  #geom_vline(xintercept = qnorm(0.5 + 0.475), size = 0.35, linetype = "dashed", color = met_slate) +
+  #geom_vline(xintercept = qnorm(0.5 - 0.475), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab(paste0(expression(X), " and ", expression(Y))) + 
+  ylab("Density")
+```
+
+
+
+---
+# Variance
+
+## Rule 1
+
+$\mathop{\text{Var}}(X) = 0 \iff X$ is a constant.
+
+- If a random variable never deviates from its mean, then it has zero variance.
+
+- If a random variable is always equal to its mean, then it's a (not-so-random) constant.
+
+---
+# Variance
+
+## Rule 2
+
+For any constants $a$ and $b$, $\mathop{\text{Var}}(aX + b) = a^2\mathop{\text{Var}}(X)$.
+
+--
+
+## Example 
+
+Suppose $X$ is the high temperature in degrees Celsius in Eugene during August. If $Y$ is the temperature in degrees Fahrenheit, then $Y = 32 + \frac{9}{5} X$. .hi-purple[What is] $\color{#9370DB}{\mathop{\text{Var}}(Y)}$.hi-purple[?]
+
+--
+
+- $\mathop{\text{Var}}(Y) = (\frac{9}{5})^2 \mathop{\text{Var}}(X) = \color{#9370DB}{\frac{81}{25} \mathop{\text{Var}}(X)}$.
+
+---
+# Variance
+
+## Variance Rule 3
+
+For constants $a$ and $b$,
+
+$$
+\mathop{\text{Var}} (aX + bY) = a^2 \mathop{\text{Var}}(X) + b^2 \mathop{\text{Var}}(Y) + 2ab\mathop{\text{Cov}}(X, Y).
+$$
+--
+
+- If $X$ and $Y$ are uncorrelated, then $\mathop{\text{Var}} (X + Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)$
+
+- If $X$ and $Y$ are uncorrelated, then $\mathop{\text{Var}} (X - Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)$
+
+
+---
+name:sample-mean
+
+# Expectation and Variance of the Sample Mean
+
+- Time for a subtle, but very important change of focus. 
+
+- Until now we have been talking about the expectation and variance of a random variable. Now we are going to focus on the expectation and variance of the **mean of a collection of random variables**. 
+  - Wait? We talk last class that the expectation is like the mean. So basically you want to focus on the mean of the mean? What do that we even mean (!)?
+  
+- A combination of random variables is also a random variable (e.g., remember how a Binomial random variable was a summation of Bernoullis?). In particular, a summation of random variables $Y_1, Y_2, Y_3 ..., Y_n$ is also a random variable, and the sample size is a constant. Hence, $\overline{Y}=\frac{ \sum_{n} Y}{n}$ is also a random variable. 
+
+---
+# Expectation and Variance of the Sample Mean
+
+- This potentially cofusing, as before we would have one random variable X, from which we would sample a collection of values $\{x_1, x_2, ... , x_n \}$, and with this we could compute the mean $\overline{X}$. 
+
+- But now we will have to imagine that we do this sampling multiple times. To help with the transition (and because it will also help with future notation), I will use the letter $Y_{\text{number } i}$ to denote random variable number $i$ (where $i$ is used to represent any given number) or $Y_{i}$ for short.
+
+- Hard to imagine if one sample corresponds to one survey that cost millions of dollars and took months or years to carry out, but think about it as a thought exercise. Believing in the multiverse in this case helps with the thought exercise :)
+
+
+
+---
+# Expectation and Variance of the Sample Mean
+
+
+- Before we start combining random variables, we need to make two important assumptions: **independence** and **identically distributed**. 
+
+- **Independence:** Two (or more) random variables are independent when knowing one random variable provides no information about the value of the other. A bit more formally, if two random variables $X$ and $Y$ are independent, then $P(X=x \& Y=y) = P(X=x)P(Y=y)$. A nice shorthand is to think of "independence as multiplication". 
+
+- **Identically Distributed:** Two (or more) random variables are identically distributed if they have the same probability distribution (or density) function. As a consequence these random variables have the same expected value, let's call it $\mu_{Y}$, and standard deviation $\sigma_{Y}$
+
+- A common abbreviation for this two assumption is to say that a collection of random variables is **i.i.d**
+
+
+
+---
+# Expectation of the Sample Mean
+
+- The expected value of the sample mean $(\overline{Y})$ is, at first glance, nothing too surprising: 
+
+$$
+\begin{equation}
+  \mathop{\mathbb{E}}(\overline{Y}) = \frac{1}{n}\sum \mathop{\mathbb{E}}(Y_i)\\
+  \mathop{\mathbb{E}}(\overline{Y}) = \frac{1}{n}\sum \mu_{Y} = \frac{n \mu_{Y}}{n}\\
+  \mathop{\mathbb{E}}(\overline{Y}) = \mu_Y
+\end{equation}
+$$
+
+(The first equality comes from Rule 2 and 3 of expectation. The second equality comes from identical means, and the third from summing $n$ times the same constant) 
+
+---
+# The Standard Deviation of the Sample Mean
+
+- The formula for variance and standard deviation of the sample mean $(\overline{Y})$ is less straight forward: 
+$$
+Var(\overline{Y}) = \frac{\sigma^{2}_{Y}}{n}
+$$
+
+$$
+SD(\overline{Y}) = \frac{ \sigma_{Y}}{\sqrt{n}}
+$$
+
+- Unlike the expectation of the mean its the standard deviation is not the same as the standard deviation of a single random variable. Moreover, it shrinks (to zero) as the sample size increases. 
+
+---
+# Exact v. Approximate Approches
+
+- We just examine the expectation and variance for the sampling mean $(\overline{Y})$ using theoretical properties of $E()$ and $Var()$ this results hold true *regardless* of the sample size $n$. But at the same time answer to a highly hypothetical question (what is the population mean of the sample mean?). 
+
+- In addition to this "exact" derivation. We can also ask what happens with $\overline{Y}$ when its sample size $(n)$ increases. This "approximate" approach is refer to as the asymptotic properties $\overline{Y}$ (but either term is fine). 
+
+- In econometrics we make extensive use of the two following approximations:  
+
+---
+# Law of Large Numbers (LLN)
+
+- Under general conditions, of independence (and finite variance), $\overline{Y}$ will be near its expected value $(\mu_Y)$ with arbitrary high probability as $n$ is large $(\overline{Y} \overset{p}{\to} \mu_{Y})$  
+
+<!--
+implications for the real world: 
+- counting 
+- surveying hard questions
+-->
+
+```{r, eval=TRUE, echo=FALSE, fig.height=5}
+library(ggplot2)
+library(scales)
+
+tossCoin = function(n=30, p=0.1) {
+
+  # create a probability distribution, a vector of outcomes (H/T are coded using 0/1)
+  # and their associated probabilities
+  outcomes = c(0,1) # sample space
+  probabilities = c(1-p,p)
+  
+  # create a random sample of n flips; this could also be done with
+  # the rbinom() function, but sample() is perhaps more useful
+  flips = sample(outcomes,n,replace=T,prob=probabilities)
+  
+  # now create a cumulative mean vector
+  cum_sum = cumsum(flips)
+  index = c(1:n)
+  cum_mean = cum_sum / index
+  
+  
+  #cum_sumsq = cumsum( (flips - cum_mean)^2 )
+  #cum_sd = 
+  
+  # now combine the index, flips and cum_mean vectors
+  # into a data frame and return it
+  # return(data.frame(index,flips,cum_mean))
+  return(data.frame(index,cum_mean))
+}
+
+
+ggplotCoinTosses = function(n=30, p=.1) {
+  # visualize how cumulative average converges on p  
+  # roll the dice n times and calculate means
+  trial1 = tossCoin(n,p)
+  max_y = ceiling(max(trial1$cum_mean))
+  if (max_y < .75) max_y = .75 
+  min_y = floor(min(trial1$cum_mean))
+  if (min_y > .4) min_y = .4
+  
+  # calculate last mean and standard error
+  last_mean = round(trial1$cum_mean[n],9)
+  
+  # plot the results together
+  plot1 = ggplot(trial1, aes(x=index,y=cum_mean)) +
+    geom_line(colour = "blue") +
+    geom_abline(intercept=0.5,slope=0, color = 'red', size=.5) +      
+    theme(plot.title = element_text(size=rel(1.5)),
+          panel.background = element_rect()) +
+    labs(x = "n (number of tosses)", 
+         y = "Cumulative Average") +
+    scale_y_continuous(limits = c(min_y, max_y)) +
+    scale_x_continuous(trans = "log10",
+                       breaks = trans_breaks("log10",function(x) 10^x),
+                       labels = trans_format("log10",math_format(10^.x))) +
+    annotate("text",
+             label=paste("Cumulative mean =", last_mean,
+                         "\nEV =",  p,
+                         "\nSample size =", n), 
+             y=(max_y - .20), 
+             x=10^(log10(n)/2), colour="darkgreen") +
+    annotate("text",
+           label=paste("P(Heads) with Fair Coin = 0.50"), 
+           y=(max_y - .80), 
+           x=10^(log10(n)/2), colour="red")
+
+  return(plot1)
+}  
+# call the function; let's use a fair coin
+ggplotCoinTosses(1e5, .5)
+```
+
+
+- Let's roll some dice in [Seeing Theory](https://seeing-theory.brown.edu/basic-probability/index.html#section2) to get a better idea. 
+
+
+---
+# Law of Large Numbers (LLN): Observations
+
+- In practical terms $n$ doesn't have to be too large. $n=25-35$ tends to be enought. In social sciences we tend to work with much more that. 
+
+```{r, echo=FALSE}
+#Assume a universe of 1 million coin toses
+universe  <- sample(c(0,1) , size = 1e6, replace = TRUE, prob = c(0.5, 0.5))
+# Simulate 100 samples where each sample has n=10, and compute its standard deviation
+sd_n10    <-  sd(sapply(1:100,  function(x) mean(sample(universe, size = 1e1) )))
+# Simulate 100 samples where each sample has n=100, and compute its standard deviation
+sd_n100   <-  sd(sapply(1:100,  function(x) mean(sample(universe, size = 1e2) )))
+# Simulate 100 samples where each sample has n=1000, and compute its standard deviation
+sd_n1000  <-  sd(sapply(1:100,  function(x) mean(sample(universe, size = 1e3) )))
+# Simulate 100 samples where each sample has n=1000, and compute its standard deviation
+sd_n10000  <-  sd(sapply(1:100,  function(x) mean(sample(universe, size = 1e4) )))
+```
+
+
+- As $n$ grows the standard deviation of the sample mean drops to zero. In the example above: $SD(\overline{Y_{10}}) = `r round(sd_n10,2)`$, $SD(\overline{Y_{100}}) = `r round(sd_n100,2)`$, $SD(\overline{Y_{1000}}) = `r round(sd_n1000,2)`$, $SD(\overline{Y_{10000}}) = `r round(sd_n10000,2)`$.
+
+---
+# Central Limit Theorem (CLT)
+- Under general conditions, of independence (and finite variance), the **distribution** of $\overline{Y}$ is approximately $N(\mu_{Y}, \frac{\sigma_{Y}^{2}}{n})$ as $n$ is large.
+
+- This is true **for any** type of distribution (not only normal) of the underlying $Y_{i}$. 
+
+- This is very hard to believe, so we are going to spend some significant time in [Seeing Theory](https://seeing-theory.brown.edu/probability-distributions/index.html#section3) simulating different scenarios (and probably over session too). 
+
+- In real life the key assumption is that of independence. If observations are obtained at random, a procedure called *random sampling*,  then independence is achieved.
+
+- Random sampling is necessary so the LLN and CLT can be used. 
+
+
+---
+# Acknowledgments
+[TO DO]
+- LLN simulation blog
+- Seeing theory
+
+
+
+```{r gen_pdf, include = FALSE, cache = FALSE, eval = FALSE}
+pagedown::chrome_print("04_sampling.html", output = "04_sampling.pdf")
+```
+
+
+
+

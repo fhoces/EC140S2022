@@ -1,0 +1,668 @@
+---
+title: "Ec140 - Selection Bias and Potential Outcomes"
+author: "Fernando Hoces la Guardia"
+date: "06/30/2022"
+output: 
+  xaringan::moon_reader:
+    footer: "These slides available at https://fhoces.github.io/econ140summer2022/"
+    css: [default, metropolis, metropolis-fonts] 
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+.remark-slide-content {
+    font-size: 30px;
+    padding: 1em 1em 1em 1em;
+}
+</style>
+
+```{r , include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, 
+       parallel, Ecdat, wooldridge, dslabs, ggforce, emo, png, grid, pander, 
+       countdown, emoGG, haven)
+
+
+options(htmltools.dir.version = FALSE)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+
+overwrite = FALSE
+
+
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Notes directory
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+
+
+
+```
+
+
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, parallel, Ecdat, wooldridge, dslabs, ggforce)
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Notes directory
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+
+#df_nhis <- read_dta("NHIS2009_clean.dta")
+
+```
+
+
+
+# Housekeeping 
+
+- PS1 due Tomorrow ar 5pm on Gradescope. 
+  - Last question ("Describe how an RCT...") is now optional. 
+  - Aim to submit at 4pm, to avoid any potential problem related with uploading. **Late problem sets will not be graded**. 
+
+
+---
+
+# Today's Lecture
+
+- Selection Bias
+
+- Potential Outcomes Framework
+
+---
+# Selection Bias 
+[Wikipedia Definition](https://en.wikipedia.org/wiki/Selection_bias):
+>Selection bias is the bias introduced by the selection of individuals, groups, or data for analysis in such a way that proper randomization is not achieved, thereby failing to ensure that the sample obtained is representative of the population intended to be analyzed. 
+
+- Econometric textbooks, tend to define selection bias in term of a regression or (as MM) a randomized controlled trial. 
+
+- We will start from this more general definition to connect with the concept of **conditional expectation**. 
+
+- Then we will connect with regression and experiments.  
+
+
+---
+background-image: url("Images/Survivorship-bias.png")
+background-size: contain
+
+
+
+# SB Example 1: Airplanes in World War II
+
+---
+background-image: url("Images/Survivorship-bias.png")
+background-size: 40%
+background-position: 100% 50%
+
+
+# .font80[SB Example 1: Airplanes in World War II. Using Expectation 1/2]
+
+
+.pull-left[
+.font70[
+
+- How would you use conditional expectations to characterize this problem? 
+
+- Let's start by simplifying the problem by assuming that each plane only had two sections. Now define two random variables: binary variables (bernulli) to indicate if the plane received damage in locations one, and two.   $(DL1:\{\text{No damaged in lct 1, Damaged in lct} 1\} \to \{0,1\}$, same for $DL2)$. 
+
+- We also need to define random variable for that we are conditioning on. In this case, let's use a binary variable for return $(R:\{\text{Plane didn't return, Plane returned} \}\to\{0,1\})$
+
+
+]
+]
+
+---
+background-image: url("Images/Survivorship-bias.png")
+background-size: 40%
+background-position: 100% 50%
+
+# .font80[SB Example 1: Airplanes in World War II. Using Expectation 2/2]
+
+
+.pull-left[
+.font70[
+
+- One way of characterizing the problem would be that the engineers thought they where observing $\mathop{\mathbb{E}}(DL1)$ and $\mathop{\mathbb{E}}(DL2)$ and concluding $\mathop{\mathbb{E}}(DL1) > \mathop{\mathbb{E}}(DL2)$. 
+
+- But in they were actually observing $\mathop{\mathbb{E}}(DL1|R=1)$ and $\mathop{\mathbb{E}}(DL2|R=1)$ and most likely $\mathop{\mathbb{E}}(DL1|R=0) < \mathop{\mathbb{E}}(DL2|R=0)$ 
+
+- If you don't like the math notation, you can provide the same answer, but in narrative form. 
+
+- This is called [survivorship bias](https://en.wikipedia.org/wiki/Survivorship_bias), and is a type of selection bias. 
+]
+]
+
+
+---
+background-image: url("Images/MMtbl11_health.png")
+background-size: 50%
+background-position: 100% 50%
+# SB Example 2: Health Insurance 1/2
+.font70[
+.pull-left[
+- We can do something similar for our health insurance example. 
+- The "hidden" information could be many things. For example: maybe uninsured people are less have different standards of what constitutes good health, and for the same true health status, uninsured tend to report much higher scores than insured (thanks Andy!). 
+]
+]
+---
+background-image: url("Images/MMtbl11_health.png")
+background-size: 50%
+background-position: 100% 50%
+# SB Example 2: Health Insurance 2/2
+.font70[
+.pull-left[
+- Define a binary random variable that represents if an individual tends to over report good health or not $(ORep:\{\text{no over report, over reports} \}\to\{0,1\})$. In this case the previous comparison translates into: 
+- $\mathop{\mathbb{E}}(H|HI=1, \color{#FD5F00}{Orep = 1} )$  for column (4), and $\mathop{\mathbb{E}}(H|HI=0, \color{#FD5F00}{Orep = 0} )$  for column (5).
+- This is a violation of *other things equal* assumption. 
+]
+]
+---
+# .font90[SB Example 3: Country Characterization by Foreign Visitors]
+
+- Characterization of Americans according to foreigners visiting Berkeley. 
+
+- Characterization of Chinese according to foreigner visiting a specific city. 
+
+--
+
+**Implications:**
+
+-> Selection Bias is a key reason to promote diversity equity and inclusion (DEI) 
+
+-> Selection Bias is one of the main reasons it is so important that you ask questions in class. Especially questions like "I didn't understand that last concept, could you please explain it again?"
+ 
+
+
+
+---
+background-image: url("Images/selection_bias_2x.png")
+background-size: contain
+background-position: 90% 50%
+
+# More Examples
+.pull-left[
+- Convention of Statisticians. [XQCD](https://xkcd.wtf/2618/)
+- [Heike Crabs](https://www.youtube.com/watch?v=dIeYPHCJ1B8)
+- Appearance and Intelligence of Movie Stars (From [Causal Inference, The Mixtape](https://mixtape.scunning.com/03-directed_acyclical_graphs#sample-selection-and-collider-bias))
+- Think of at least two examples yourself!
+- ([Hernan Cascicari on Surveys](https://www.youtube.com/watch?v=_wHXjs7PPTw) <br> [in Spanish, and strong language warning])
+]
+
+
+
+---
+class: inverse, middle
+
+# Potential Outcomes Framework 
+
+
+
+
+
+
+---
+# The Potential Outcomes Framework
+
+***Key idea***: Each individual can be exposed to **multiple alternative treatment states**.
+  - smoking cigarrettes, smoking cigars or not smoking,
+  - growing up in a poor vs a middle class neighborhood vs a rich neighborhood,
+  - being in a small or a big class.
+  
+
+
+.pull-left[
+For practicality, let this treatment variable $D_i$ be a binary variable:
+
+$$
+D_i = \begin{cases} 
+                    1 \textrm{ if individual $i$ is treated} \\\\ 
+                    0 \textrm{ if individual $i$ is not treated} 
+      \end{cases}
+$$
+]
+
+
+
+.pull-right[
+
+***Treatment group***  
+all the individuals such that $D_i = 1$.
+
+***Control group***  
+all the individuals such that $D_i = 0$.
+]
+
+---
+
+
+# The Potential Outcomes Framework
+
+* In this framework, each individual has two ***potential outcomes***, but only one ***observed outcome*** $Y_i$:
+  
+  - $Y_{1i}$: *potential outcome if individual $i$ receives the treatment* $(D_i = 1)$,
+  
+  - $Y_{0i}$: *potential outcome if individual $i$ does not receive the treatment* $(D_i = 0)$.
+
+--
+
+* In real life we only observe $Y_i$ which can be written as:
+
+$$Y_i = D_i \times Y_{1i} + (1- D_i) \times Y_{0i}$$
+
+--
+
+* ***Fundamental Problem of Causal Inference***: for any individual $i$, we only observe one of either potential outcomes [(Holland, 1986)](http://people.umass.edu/~stanek/pdffiles/causal-holland.pdf).
+
+---
+background-image: url("Images/sliding_doors.jpg")
+background-size: 34%
+background-position: 50% -12%
+
+# Example: Sliding Doors (1998)
+
+
+--
+.pull-left[
+.font180[
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; $Y_{1i}$
+]
+]
+
+.pull-right[
+<br><br><br><br><br><br><br><br><br>
+.font180[
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $Y_{0i}$
+]
+]
+
+---
+background-image: url("Images/sliding_doors.jpg")
+background-size: 34%
+background-position: 50% -12%
+
+# Example: Sliding Doors (1998)
+
+
+
+.pull-left[
+.font180[
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; $Y_{1i}$
+]
+
+<br><br>
+- Other examples: 
+  - Run Lola Run
+  - Avenger's What If?
+  - Midnight Library
+  - Suggestions?
+]
+
+.pull-right[
+<br><br><br><br><br><br><br><br><br>
+.font180[
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $Y_{0i}$
+]
+]
+
+---
+
+# The Potential Outcomes Framework
+
+.font80[
+* The potential outcome that is not observed exists in principle, it is called the ***counterfactual outcome***.
+
+
+
+Group | $Y_{1i}$ | $Y_{0i}$
+--------|:---------:|:---------:
+Treatment group $(D_i = 1)$ &nbsp; &nbsp; | &nbsp; &nbsp; Observable as $Y_i$ &nbsp; &nbsp; | Counterfactual
+Control group $(D_i = 0)$ | Counterfactual | &nbsp; &nbsp; Observable as $Y_i$ &nbsp; &nbsp;
+
+
+
+* From these we can define the ***individual treatment effect*** $\kappa_i$:
+
+$$\kappa_{i} = Y_{1i} - Y_{0i}$$
+
+* $\kappa_i$ measures the **causal effect of the treatment $(D_i)$** on outcome $Y$ for individual $i$ (let's read this using the Sliding Doors example).
+
+
+* Since the treatment effect *cannot* be observed at the individual level, we estimate averages across many individuals.
+
+]
+---
+background-image: url("Images/MMtbl12.png")
+background-size: 55%
+background-position: 110% 00%
+
+# Book Example 1/2
+.font80[
+.pull-left[
+- In this ideal scenario, we can observe both worlds: the health and Maria and Khuzdar with and without health insurance. 
+- Here we can compute the individual treatment $(\kappa_{i})$ effect for each. For example: 
+- $Y_{1,Khuzdar}-Y_{0,Khuzdar}=1$  
+- In the real world, Khuzdar has HI, while Maria Doesn't, Hence the comparison between could be of interest: 
+- $Y_{Khuzdar}-Y_{Maria}=-1$  
+- Can we interpret this difference as causal?
+]
+]
+
+---
+background-image: url("Images/MMtbl12.png")
+background-size: 55%
+background-position: 110% 00%
+
+# Book Example 2/2
+.font80[
+.pull-left[
+- *Other things equal* fails here, because their initial health was different. Let's looks a the simple difference but adding and subtracting Khuzdar health without HI. 
+
+
+- The first parenthesis represents a (individual) causal effect. The second term represent the things that are not equal. 
+
+
+$$
+\begin{align}
+Y_{Khuzdar} - Y_{Maria} &= Y_{1,Khuzdar} - Y_{0,Maria}\\
+ &= (Y_{1,Khuzdar} - Y_{0,Khuzdar}) + (Y_{0,Khuzdar} - Y_{0,Maria})\\
+ &= (1) + (-2)\\
+\end{align}
+$$  
+
+]
+]
+--
+.font80[
+.pull-right[
+<br><br><br><br><br><br><br><br><br><br><br>
+- Now let's move into a (slightly) larger data set. 
+]
+]
+---
+
+# Example: Book Example, But with $N=10$ 
+.font80[
+
+.pull-left[
+$i$ | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &nbsp; &nbsp; $\kappa$ &nbsp; &nbsp; 
+:-----------|:---------:|:---------:|:---------:|---------:|
+  1 | 5 |   2 |  1 |   3 | 
+  2 | 1 |   4 |  0 |  -3 | 
+  3 | 3 |   1 |  1 |   2 | 
+  4 | 2 |   1 |  1 |   1 | 
+  5 | 4 |   4 |  0 |   0 | 
+  6 | 5 |   4 |  1 |   1 | 
+  7 | 1 |   2 | 1  |  -1 | 
+  8 | 2 |   3 | 0  |  -1 | 
+  9 | 4 |   1 |  0 |   3 | 
+ 10 | 3 |   1 |  0 |   2 | 
+  Average  | 3 | 2.3 | 0.5 |0.7 |
+
+]
+]
+
+.pull-right[
+.font80[
+- Potential outcomes for health of individual with $(Y_1)$ and without $(Y_0)$ health insurance. 
+
+- Analogous to the individual comparison, we could be interested in the average comparison: 
+
+$$
+\begin{align}
+Avg_n[Y_{1i} - Y_{0i}] = \frac{1}{n}\sum_{i=1}^{n}(Y_{1i}) - \frac{1}{n}\sum_{i=1}^{n}(Y_{0i}) 
+\end{align}
+$$ 
+- This mean is the the average causal effect  
+- Can we compute this mean?
+]
+]
+
+---
+
+# Example: Book Example, But with $N=10$ 
+.font80[
+
+.pull-left[
+$i$ | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &nbsp; &nbsp; $\kappa$ &nbsp; &nbsp; 
+:-----------|:---------:|:---------:|:---------:|---------:|
+  1 | 5 |   NA |  1 |   3 | 
+  2 | NA |   4 |  0 |  -3 | 
+  3 | 3 |   NA |  1 |   2 | 
+  4 | 2 |   NA |  1 |   1 | 
+  5 | NA |   4 |  0 |   0 | 
+  6 | 5 |   NA |  1 |   1 | 
+  7 | 1 |   NA | 1  |  -1 | 
+  8 | NA |   3 | 0  |  -1 | 
+  9 | NA |   1 |  0 |   3 | 
+ 10 | NA |   1 |  0 |   2 | 
+  Average  | 3 | 2.3 | 0.5 |0.7 |
+
+]
+]
+
+.pull-right[
+.font80[
+- Potential outcomes for health of individual with $(Y_1)$ and without $(Y_0)$ health insurance. 
+
+- Analogous to the individual comparison, we could be interested in the average comparison: 
+
+$$
+\begin{align}
+Avg_n[Y_{1i} - Y_{0i}] = \frac{1}{n}\sum_{i=1}^{n}(Y_{1i}) - \frac{1}{n}\sum_{i=1}^{n}(Y_{0i}) 
+\end{align}
+$$ 
+- This mean is the the average causal effect  
+- Can we compute this mean?
+- **We can't.** 
+]
+]
+
+---
+
+# The Problem of Causal Inference
+
+* From the data, we can compute the *difference-in-group-means*:
+
+$$
+\begin{align}
+\text{Difference in group means} &= \underbrace{\frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1)}_{Avg_n[Y_i|D_i=1]} - \underbrace{\frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0)}_{Avg_n[Y_i|D_i=0]}
+\end{align}
+$$ 
+
+- Is $\color{#e64173}{\mathop{Avg}\left( Y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( Y_i\mid D_i =0 \right)}$ a *good* estimator for the average causal effect?
+
+---
+# Estimating Causal Effects
+
+**Assumption:** Let $\kappa_i = \kappa$ for all $i$.
+
+- The treatment effect is equal (constant) across all individuals $i$.
+
+--
+
+**Note:** We defined
+
+$$
+\begin{align}
+  \kappa_i = \kappa = \color{#e64173}{Y_{1,i}} - \color{#9370DB}{Y_{0,i}}
+\end{align}
+$$
+
+which implies
+
+$$
+\begin{align}
+   \color{#e64173}{Y_{1,i}} = \color{#9370DB}{Y_{0,i}} + \kappa
+\end{align}
+$$
+
+---
+# Simple Difference in Group Means
+
+
+Is $\color{#e64173}{\mathop{Avg}\left( Y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( Y_i\mid D_i =0 \right)}$ a *good* estimator for the average causal?
+
+
+$$
+\begin{aligned}
+\text{Difference in group means} &=  \color{#e64173}{\mathop{Avg}\left( \color{#000000}{Y_i}\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( \color{#000000}{Y_i}\mid D_i =0 \right)} \\
+&=  \color{#e64173}{\mathop{Avg}\left( Y_{1,i}\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( Y_{0,i}\mid D_i =0 \right)}\\
+&= \color{#e64173}{\mathop{Avg}\left( \color{#000000}{\kappa \: +} \: \color{#9370DB}{Y_{0,i}} \mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( Y_{0,i}\mid D_i =0 \right)}\\
+&=  \kappa + \underbrace{\color{#e64173}{\mathop{Avg}\left(\color{#9370DB}{Y_{0,i}} \mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( Y_{0,i}\mid D_i =0 \right)} }_{\text{Selection bias}}\\
+&=  \text{Average causal effect} + \color{#FD5F00}{\text{Selection bias}}\\
+\end{aligned}
+$$
+
+Our proposed difference-in-means estimator gives us the sum of: 
+
+1. $\kappa$, the average causal effect that we want.
+2. **Selection bias** How much treatment and control groups differ, on average.
+
+---
+
+# Let's Bring Expectations Back!
+We previously defined expectations as the population version of the mean. Hence, we can use expectation to represent this problem at the population level: 
+$$
+\begin{align}
+  \mathop{\mathbb{E}}(\text{Difference in group means}) &= \kappa + \underbrace{\mathop{\mathbb{E}}(Y_{i0} | D_i = 1) - \mathop{\mathbb{E}}(Y_{i0} | D_i = 0)}_\text{Selection bias} 
+\end{align}
+$$
+
+- Looking at the expectations formulation of selection bias, it becomes clear that our problems would be solved if we could make $Y_{i0}$ independent of $D$.  
+
+
+---
+# Note: On Name of The Problem
+
+- In addition to ***The Fundamental Problem of Causal Inference***, this problem is usually referred with the following terms:
+
+- We are **missing data** on all the potential outcomes for which the treatment status did not happen in real world. Hence this is also referred as a missing data problem. 
+
+- This is also called a **identification** problem (as in: we cannot identify the average treatment effect). 
+
+- In this course, you will not be asked to memorize the different names, just be aware of the different teminolgy when consulting references. 
+
+
+---
+class: title-slide-final
+background-image: url("Images/correlation.png")
+background-size: 60%
+background-position: 50% 100%
+
+# Acknowledgments
+
+.pull-left[
+- [Kyle Raze's Undergraduate Econometrics 1](https://github.com/kyleraze/EC320_Econometrics)
+- [ScPoEconometrics](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/chapter_causality.html#1)
+- XQCD
+- MM
+]
+.pull-right[
+- [Matt Hollian](http://mattholian.blogspot.com/2015/01/econometrics-and-kung-fu.html#more) 
+- Causal Mixtape (Also Hanna Fry)
+- Wikipedia (Survivorship Bias)
+- MM [bookdown](https://jrnold.github.io/masteringmetrics/rand-health-insurance-experiment-hie.html) and MM [blog post](file:///Users/fhoces/Desktop/sandbox/econ140summer2022/NHIS.html) on chapter 1
+]
+
+
+
+
+
+
+```{r gen_pdf, include = FALSE, cache = FALSE, eval = TRUE}
+pagedown::chrome_print("07_potential_outcomes.html", output = "07_potential_outcomes.pdf")
+```

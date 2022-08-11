@@ -1,0 +1,907 @@
+---
+title: "All Together"
+subtitle: "Part I"
+author: "Fernando Hoces la Guardia"
+date: "08/8/2022"
+output: 
+  xaringan::moon_reader:
+    footer: "These slides available at https://fhoces.github.io/econ140summer2022/"
+    css: [default, metropolis, metropolis-fonts, "my-css.css"] 
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+.remark-slide-content {
+    font-size: 30px;
+    padding: 1em 1em 1em 1em;
+}
+</style>
+
+```{r , include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, 
+       parallel, Ecdat, wooldridge, dslabs, ggforce, emo, png, grid, pander, 
+       countdown, emoGG, haven, broom, ggridges, gridExtra, kableExtra, snakecase, 
+       janitor, data.table, lubridate, lfe, here, gapminder, AER, stargazer, margins, 
+       furrr)
+
+
+# Define pink color
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#3b3b9a"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+slate <- "#314f4f"
+# Dark slate grey: #314f4f
+
+options(htmltools.dir.version = FALSE)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+
+overwrite = FALSE
+
+
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Notes directory
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = FALSE
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -0.5, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_simple <- theme_bw() + theme(
+  line = element_blank(),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text.x = element_text(size = 18, family = "STIXGeneral"),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  # plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes_math <- theme_void() + theme(
+  text = element_text(family = "MathJax_Math"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes_serif <- theme_void() + theme(
+  text = element_text(family = "MathJax_Main"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes <- theme_void() + theme(
+  text = element_text(family = "Fira Sans Book"),
+  axis.title = element_text(size = 18),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = grey_light,
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_set(theme_gray(base_size = 20))
+# Column names for regression results
+reg_columns <- c("Term", "Est.", "S.E.", "t stat.", "p-Value")
+# Function for formatting p values
+format_pvi <- function(pv) {
+  return(ifelse(
+    pv < 0.0001,
+    "<0.0001",
+    round(pv, 4) %>% format(scientific = F)
+  ))
+}
+format_pv <- function(pvs) lapply(X = pvs, FUN = format_pvi) %>% unlist()
+# Tidy regression results table
+tidy_table <- function(x, terms, highlight_row = 1, highlight_color = "black", highlight_bold = T, digits = c(NA, 3, 3, 2, 5), title = NULL) {
+  x %>%
+    tidy() %>%
+    select(1:5) %>%
+    mutate(
+      term = terms,
+      p.value = p.value %>% format_pv()
+    ) %>%
+    kable(
+      col.names = reg_columns,
+      escape = F,
+      digits = digits,
+      caption = title
+    ) %>%
+    kable_styling(font_size = 20) %>%
+    row_spec(1:nrow(tidy(x)), background = "white") %>%
+    row_spec(highlight_row, bold = highlight_bold, color = highlight_color)
+}
+
+
+```
+
+
+
+```{css, echo = F, eval = T}
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+```
+
+# Today's and Tomorrow's Lecture
+
+- Review most of our tools for causal inference applying them to one policy issue:
+  - The effect of education on earnings
+
+We will do this in three steps: 
+
+- First we will use selection bias, potential outcomes, RCTs and regression to frame this causal question. 
+
+- Then we will learn our last important concept: bad controls.
+
+- Finally we will see how we can use IV, DD and RDD to answers this question. 
+  
+
+---
+# Earnings and Schooling
+
+- Understanding what is behind a persons' earnings is a core question in economics: 
+    - From a economic growth perspective, its important to understand what drives growth in individual incomes. 
+    - From as distributional perspective, its important to understand why some earn so much more than others.
+- One possible channel that could help us understand what causes income (growth and inequality) is education. Let's go ahead and define our causal question: 
+   - What is the effect of one additional year of schooling $(S_i)$ on earnings $(Y_i)$ in the US? 
+   - First approach: RCT as a thought exercise, compare with a simple difference in groups. 
+   
+---
+# Definitions
+
+- Outcome $(Y_i)$: annual earnings
+- Treatment $(S_i)$: years of education
+  - Important underlying assumption: no differences in education quality (i.e. one additional year of education in Cal is the same as one additional year of education in Trump University).  
+  - This is strong and unrealistic assumption, but provides a good starting point, and the methods here can (and have been) extended to account for differences in quality.  
+- Populations: typically a representative sample of US adults (but will vary across studies). 
+
+
+
+---
+count: false
+# Answering the Causal Question: Before Expectations
+
+- Simple difference in groups between individuals with one year difference in education.  For example between 13 and 12 years of education:  
+$$
+\begin{equation}
+  \text{Simple Differce in Groups} = \\
+  [\text{Average earnings among those with 13 years of schooling}] - \\
+   \quad \quad[\text{Average earnings among those with 12 years of schooling}] 
+\end{equation}
+$$
+--
+
+$$
+\begin{aligned}
+  \text{Simple Differce in Groups} &= Avg[Earnings_i | Schooling_i =  13] - \\
+  &\quad \quad Avg[Earnings_i | Schooling_i =  12]
+\end{aligned}
+$$
+---
+# Answering the Causal Question: Before Expectations
+
+- Simple difference in groups between individuals with one year difference in education.  For example between 13 and 12 years of education:  
+$$
+\begin{equation}
+  \text{Simple Differce in Groups} = \\
+  [\text{Average earnings among those with 13 years of schooling}] - \\
+   \quad \quad[\text{Average earnings among those with 12 years of schooling}] 
+\end{equation}
+$$
+
+
+$$
+\begin{aligned}
+  \text{Simple Differce in Groups} &= Avg[Earnings_i | Schooling_i =  13] - \\
+  &\quad \quad Avg[Earnings_i | Schooling_i =  12]\\
+   &= Avg[Y_i | S_i =  13] - Avg[Y_i | S_i =  12]\\
+   &= [\overline Y | S =  13] - [\overline Y | S =  12]\\
+\end{aligned}
+$$
+
+--
+- But what is the difference for many samples over the long run?
+
+---
+count:false
+# Expectations, Selection Bias & Potential Outcomes
+
+
+- Expected value of simple difference in groups between individuals with one year difference in education (now for any given one year difference, $s+1$ and $s)$: 
+$$
+\begin{align}
+  \mathop{\mathbb{E}}(\text{Simple Differce in Groups}) &= \mathop{\mathbb{E}}(Y_i|S_i = s +1)  -  \mathop{\mathbb{E}}(Y_i|S_i = s)\\ 
+\end{align}
+$$
+
+    
+
+
+---
+# Expectations, Selection Bias & Potential Outcomes
+
+- Expected value of simple difference in groups between individuals with one year difference in education (now for any given one year difference, $s+1$ and $s)$: 
+$$
+\begin{align}
+  \mathop{\mathbb{E}}(\text{Simple Differce in Groups}) &= \mathop{\mathbb{E}}(Y_i|S_i = s +1)  -  \mathop{\mathbb{E}}(Y_i|S_i = s)\\ 
+  &=\kappa + \underbrace{\mathop{\mathbb{E}}(Y_{i0} | S_i = s + 1) - \mathop{\mathbb{E}}(Y_{i0} | S_i = s)}_\text{Selection bias} 
+\end{align}
+$$
+    
+- Do we think that the earnings of individuals who get one more year of education **would have been** similar to those that didn't get that additional year? 
+- If the answer is no, then we have selection bias. 
+
+---
+# Regression and CEF
+- We can also rewrite the expected SDG as using regression (exactly if CEF is linear, as with a binary regressors, or with the best approximation if CEF is not linear): 
+$$
+\begin{aligned}
+Y_i  = \alpha + \underbrace{\mathop{\mathbb{E}}(\text{Simple Differce in Groups})}_{\rho} \times S_i + e_i\\
+\end{aligned}
+$$
+- Now we have our first regression equation for our causal question of interest: 
+
+$$
+\begin{aligned}
+Y_i  = \alpha + \rho S_i + e_i\\
+\end{aligned}
+$$
+
+- One advantage of having moved from SDG to regression is that we can try to control for other things that might be behind this selection bias.
+- And to interpret $\rho$ as percentage change (or "return") in earnings (from a 1-unit change in schooling), we replace the dependent variable with its logs $(lnY_i)$
+
+---
+# Regression as Matching and OVB
+.font90[
+- For example, maybe excluding experience $(X_i)$ is creating some OVB. If the regression above is the short equation $(ln Y_i  = \alpha^s + \rho^s S_i + e^s_i)$, what would be the long equation, auxiliary and OVB?
+]
+--
+.font90[
+$$
+\begin{aligned}
+\text{long: } \quad &lnY_i  = \alpha^l + \rho^l S_i + \beta_1 X_i + e^l_i\\
+\text{aux: } \quad &X_i  = \pi_0 + \pi_1 S_i + u_i\\
+\text{OVB: }  \quad    &\rho^s - \rho^l  = \pi_1 \beta_1
+\end{aligned}
+$$
+]
+.font90[
+- Given that schooling requires being out of the labor force, we should expect a negative correlation between $X_i$ and $S_i$, hence $\pi_1<0$. 
+- Given that on-the-job skills improve with experience we should expect a positive relationship between $lnY_i$ and $X_i$ (up to a point), hence $\beta_1>0$. This implies that $\pi_1\beta_1<0$ and  $\rho^s - \rho^l<0$, or that $\rho^s<\rho^l$. Given that $\rho^s>0$, this means that the short regresssion is underestimating the causal effect. ]
+
+---
+# Results
+
+- First estimates of this kind were produce by Jacob Mincer for a sample of 31,000 men in the US in the 1960s:
+
+$$
+\begin{aligned}
+lnY_i  &= \alpha + 0.070 S_i + e_i\\
+        &   \quad \quad \quad   (0.002)\\
+lnY_i  &= \alpha + 0.107 S_i + 0.081 X_i - 0.0012 X_i^2 +  e_i\\
+        &   \quad \quad \quad   (0.002) \quad \quad  (0.001) \quad (0.00002)
+\end{aligned}
+$$
+
+- It is conventional to add the quadratic term for experience to capture the fact that experience increases earnings up to a point (about 30 years of experience). 
+- This result show that, **if** we believe that controlling for years of experience is enought to remove OVB, each additional year of education **causes** and increase of almost 11% (10.7%) in earnings on average. 
+
+
+
+---
+# Other Possible OVBs
+- The story that we are controlling for all possible factors that could cause OVB, is hard to believe. 
+- In economics a common catch all term to refer to commonly omitted factor is the variable "Ability". 
+- However, it is important to remember that not all omitted factors are "skills or talents" that are inmutable, and that make the treatment group "better" than the control. For example other factors like, connections, ease which individuals conduct themselves (due to gender, race or class), or other factor could equivalently generate OVB here. We could hence include a second catch all variable and call it "Privileged". 
+- But to keep things simple will keep just one variable to model the omitted factor and refer to it a $OF_i$ for other factors (corresponds to the variable $A_i$ in the book). 
+
+---
+# OVB Analysis
+.pull-left[
+.font80[
+For the case of "ability": 
+- High ability people are likely to, on average, find schooling less difficult, and get more of it (on average). Hence, $\delta_{OF, S} >0$.
+- High ability people are likely have, on average, higher wages. Hence $\gamma>0$
+
+For the case of "privileged": 
+- High privileged people are likely to, on average, find schooling less difficult, and get more of it (on average). Hence, $\delta_{OF, S} >0$.
+- High privileged people are likely have, on average, higher wages. Hence $\gamma>0$
+  
+]
+]
+
+
+.pull-right[
+.font80[
+- For simplicity we go back to the initial short regression (without experience):
+
+
+
+$$
+\begin{aligned}
+\text{short: } \quad &lnY_i  = \alpha^s + \rho^s S_i + e^s_i\\
+\text{long: } \quad &lnY_i  = \alpha^l + \rho^l S_i + \gamma OF_i + e^l_i\\
+\text{aux: } \quad &OF_i  = \pi_0 + \delta_{OF, S} S_i + u_i\\
+\text{OVB: }  \quad    &\rho^s - \rho^l  = \underbrace{\delta_{OF, S}  \gamma}_{\text{ability/privileged bias}}
+\end{aligned}
+$$
+- $OVB>0$ for both cases!
+]
+]
+
+---
+# Time to Bring More Controls?
+
+- Why not just add more controls to the regression above? 
+
+- How about occupation? 
+
+  - Occupations is likely to matter for earnings, and schooling correlates with occupations.
+  - Omiting it would lead to OVB? 
+
+- Everything that we have learn until now would point in the direction of "yes". But the answer is actually "no", and to understand why we need to explore the last concept of this course: bad controls. 
+
+
+---
+# Bad Controls
+.font90[
+
+- A control should not be included (is bad) when it is, at leas in part,  **caused** by the treatment. 
+
+- Including a bad control leads to selection bias due to composition effects. 
+
+- To see why let's use the following simplified example: 
+  - Two occupations: blue collar $(BC)$ and white collars $(WC)$ and three type of individuals: 
+    1. a first minority of individuals for whom education has no effect: their earnings don't change ($1000) and their occupations is BC with and without schooling. 
+    2. a majority of individuals for whom education **has an effect: their earnings go from 0 to $2000**, and their occupation goes from BC to WC. 
+    3. a second minority of individuals for whom education also has no effect: their earnings don't change ($4000) and their occupations is WC with and without schooling. 
+]
+
+---
+# Toy Data for Bad Controls 1/2
+
+- In this setting we know the potential outcomes of all individuals, and we randomly assign some to a treatment of one additional year of schooling and some to no additional schooling. Assuming a population of 10 we could have the following:
+
+.font110[
+```{r, echo=FALSE, eval=TRUE}
+data(wage1)
+
+df <- data.frame("pot_out_oc_0" = c( rep("BC", 8) , rep("WC", 2) ), 
+                 "pot_out_oc_1" = c( rep("BC", 2) , rep("WC", 8) ),
+                 "pot_out_w_0" = c( rep(1, 2) , rep(0, 6), rep(4, 2)), 
+                 "pot_out_w_1" = c( rep(1, 2) , rep(2, 6), rep(4, 2)))
+
+df <- df %>% mutate("indiv_te" = pot_out_w_1 - pot_out_w_0, 
+              "treat" = rep(c(0,1), 5), 
+              "ocup" = if_else(treat == 1, pot_out_oc_1, pot_out_oc_0),
+              "wage" = if_else(treat == 1, pot_out_w_1, pot_out_w_0))
+      
+wage1 <- select(wage1, wage, educ, tenure, female, nonwhite) %>%
+  mutate(wage = round(wage, 2))
+DT::datatable(
+  df,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>', 
+    '<span style="color: #007935 !important">\\(TE_{i}\\)</span>',
+    '<span style="color: #007935 !important">\\(D\\)</span>', 
+    '<span style="color: #007935 !important">\\(OC_{i}\\)</span>', 
+    '<span style="color: #007935 !important">\\(Y^{w}_{i}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 3,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#FD5F00')
+```
+]
+
+---
+
+# Toy Data for Bad Controls 2/2
+
+.font80[
+```{r, echo=FALSE, eval=TRUE}
+
+DT::datatable(
+  df,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>', 
+    '<span style="color: #007935 !important">\\(TE_{i}\\)</span>',
+    '<span style="color: #007935 !important">\\(D\\)</span>', 
+    '<span style="color: #007935 !important">\\(OC_{i}\\)</span>', 
+    '<span style="color: #007935 !important">\\(Y^{w}_{i}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#FD5F00')
+```
+]
+
+
+
+
+
+---
+# Estimating Average Treatment Effects Without Controls
+
+.left-thin[
+- Average wage for treatment group: 
+$(\overline Y^{w}|D = 1) = `r mean(df$wage[df$treat==1])`$
+- Average wage for control group: 
+$(\overline Y^{w}|D = 0) = `r mean(df$wage[df$treat==0])`$
+- Average causal effect: 
+$(\overline Y^{w}|D = 1) -$  
+$(\overline Y^{w}|D = 0) = `r mean(df$wage[df$treat==1]) - mean(df$wage[df$treat==0])`$
+]
+
+
+.right-wide[
+.font70[
+```{r, echo=FALSE, eval=TRUE}
+
+DT::datatable(
+  df,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>', 
+    '<span style="color: #007935 !important">\\(TE_{i}\\)</span>',
+    '<span style="color: #007935 !important">\\(D\\)</span>', 
+    '<span style="color: #007935 !important">\\(OC_{i}\\)</span>', 
+    '<span style="color: #007935 !important">\\(Y^{w}_{i}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#FD5F00')
+```
+]
+]
+
+
+---
+# .font90[Estimating Average Treatment Effects With Bad Controls 1/2]
+
+.left-thin[
+- Average wage for treatment group, **in occupation BC:** 
+$(\overline Y^{w}|D = 1, OC=BC) = `r mean(df$wage[df$treat==1 & df$ocup=="BC"])`$
+- Average wage for control group, **in occupation BC:**
+$(\overline Y^{w}|D = 0, OC=BC) = `r mean(df$wage[df$treat==0 & df$ocup=="BC"])`$
+- Average causal effect, **in occupation BC:**: 
+$(\overline Y^{w}|D = 1, OC=BC) -$  
+$(\overline Y^{w}|D = 0, OC=BC) = `r mean(df$wage[df$treat==1 & df$ocup=="BC"]) - mean(df$wage[df$treat==0 & df$ocup=="BC"])`$
+]
+
+
+.right-wide[
+.font70[
+```{r, echo=FALSE, eval=TRUE}
+
+DT::datatable(
+  df,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>', 
+    '<span style="color: #007935 !important">\\(TE_{i}\\)</span>',
+    '<span style="color: #007935 !important">\\(D\\)</span>', 
+    '<span style="color: #007935 !important">\\(OC_{i}\\)</span>', 
+    '<span style="color: #007935 !important">\\(Y^{w}_{i}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#FD5F00')
+```
+]
+]
+
+
+---
+# .font90[Estimating Average Treatment Effects With Bad Controls 2/2]
+
+.left-thin[
+- Average wage for treatment group, **in occupation WC:** 
+$(\overline Y^{w}|D = 1, OC=WC) = `r mean(df$wage[df$treat==1 & df$ocup=="WC"])`$
+- Average wage for control group, **in occupation WC:**
+$(\overline Y^{w}|D = 0, OC=WC) = `r mean(df$wage[df$treat==0 & df$ocup=="WC"])`$
+- Average causal effect, **in occupation WC:**: 
+$(\overline Y^{w}|D = 1, OC=WC) -$  
+$(\overline Y^{w}|D = 0, OC=WC) = `r mean(df$wage[df$treat==1 & df$ocup=="WC"]) - mean(df$wage[df$treat==0 & df$ocup=="WC"])`$
+]
+
+
+.right-wide[
+.font70[
+```{r, echo=FALSE, eval=TRUE}
+
+DT::datatable(
+  df,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>', 
+    '<span style="color: #007935 !important">\\(TE_{i}\\)</span>',
+    '<span style="color: #007935 !important">\\(D\\)</span>', 
+    '<span style="color: #007935 !important">\\(OC_{i}\\)</span>', 
+    '<span style="color: #007935 !important">\\(Y^{w}_{i}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#e64173')
+
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+```
+]
+]
+
+
+
+---
+# Summing Up
+
+- We have treatment that we know has some positive effect on most of the population $(Y_{1i} - Y_{0i} = 2)$ and null for the rest $(Y_{1i} - Y_{0i} = 0)$. In a setting with random assignment the simple difference in groups is the average causal effect for the entire population: $(\overline Y^{w}|D = 1) - (\overline Y^{w}|D = 0) = `r mean(df$wage[df$treat==1]) - mean(df$wage[df$treat==0])`$
+  
+- But after we control for occupation, a variable that is also affected by the treatment, the simple difference for each sub-group is contaminated by selection bias: $(\overline Y^{w}|D = 0, OC=BC) = `r mean(df$wage[df$treat==1 & df$ocup=="BC"]) - mean(df$wage[df$treat==0 & df$ocup=="BC"])`$  and  $(\overline Y^{w}|D = 0, OC=WC) = `r mean(df$wage[df$treat==1 & df$ocup=="WC"]) - mean(df$wage[df$treat==0 & df$ocup=="WC"])`$
+
+- This happens because the treatment affects the composition groups $BC$ and $WC$ in terms of wages.   
+
+
+---
+# Composition Effects 1/3
+
+.pull-left[
+- Without the treatment the potential outcomes for occupation and wages are such that most low wages are in occupation BC. So the average wages for groups BC and WC are:
+
+- $(\overline Y_{0}^{w}|OC=BC) = `r mean(df$pot_out_w_0[df$pot_out_oc_0=="BC"])`$
+- $(\overline Y_{0}^{w}|OC=WC) = `r mean(df$pot_out_w_0[df$pot_out_oc_0=="WC"])`$
+]
+
+
+.pull-right[
+.font80[
+```{r, echo=FALSE, eval=TRUE}
+df1 <- df %>%  select(pot_out_oc_0, pot_out_oc_1, pot_out_w_0, pot_out_w_1)
+DT::datatable(
+  df1,
+  colnames = c(
+    '<span style="color: #fb6107 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #fb6107 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle('pot_out_oc_0', color = red) %>%
+  DT::formatStyle('pot_out_w_0', color = red) %>%
+  DT::formatStyle(0, color = '#e64173')
+
+```
+]
+]
+
+
+---
+# Composition Effects 2/3
+
+.pull-left[
+- With the treatment the potential outcomes for occupation and wages are such that most who had were low wages before the treatment are now in occupation WC. So the average wages for groups BC and WC are:
+
+- $(\overline Y_{1}^{w}|OC=BC) = `r mean(df$pot_out_w_1[df$pot_out_oc_1=="BC"])`$
+- $(\overline Y_{1}^{w}|OC=WC) = `r mean(df$pot_out_w_1[df$pot_out_oc_1=="WC"])`$
+]
+
+
+.pull-right[
+.font80[
+```{r, echo=FALSE, eval=TRUE}
+df1 <- df %>%  select(pot_out_oc_0, pot_out_oc_1, pot_out_w_0, pot_out_w_1)
+DT::datatable(
+  df1,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #fb6107 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #fb6107 !important">\\(Y^{w}_{i1}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle('pot_out_oc_1', color = red) %>%
+  DT::formatStyle('pot_out_w_1', color = red) %>%
+  DT::formatStyle(0, color = '#e64173')
+
+```
+]
+]
+
+---
+# Composition Effects 3/3
+
+.pull-left[
+- And when comparing average potential outcomes within occupational groups we get:
+
+$(\overline Y_{1}^{w}|OC=BC) - (\overline Y_{0}^{w}|OC=BC) = `r mean(df$pot_out_w_1[df$pot_out_oc_1=="BC"]) - mean(df$pot_out_w_0[df$pot_out_oc_0=="BC"])`$  
+$(\overline Y_{1}^{w}|OC=WC) - (\overline Y_{0}^{w}|OC=WC) = `r mean(df$pot_out_w_1[df$pot_out_oc_1=="WC"]) - mean(df$pot_out_w_0[df$pot_out_oc_0=="WC"])`$
+
+- Notice that to show this last part we didn't need the treatment assignment and effective outcomes. This is why skips all of it (but I hope it adds a bit more intuition!). 
+
+]
+
+
+.pull-right[
+.font80[
+```{r, echo=FALSE, eval=TRUE}
+df1 <- df %>%  select(pot_out_oc_0, pot_out_oc_1, pot_out_w_0, pot_out_w_1)
+DT::datatable(
+  df1,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #fb6107 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #fb6107 !important">\\(Y^{w}_{i1}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle('pot_out_oc_1', color = red) %>%
+  DT::formatStyle('pot_out_w_1', color = red) %>%
+  DT::formatStyle(0, color = '#e64173')
+
+```
+]
+]
+
+---
+# Connecting This Example With MM's Example
+
+.pull-left[
+- To map this toy data to the Table 6.1 in the book: 
+
+- Keep one of each type of response to treatments (keep rows 1, 3, 9). 
+
+- Assume a constant treatment effects of $500 for all. 
+
+- And change the values of wages for $Y_0$ to $1000, $2000, and $3000.  
+
+]
+
+
+.pull-right[
+.font80[
+```{r, echo=FALSE, eval=TRUE}
+df1 <- df %>%  select(pot_out_oc_0, pot_out_oc_1, pot_out_w_0, pot_out_w_1)
+DT::datatable(
+  df1,
+  colnames = c(
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{oc}_{i1}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i0}\\)</span>',
+    '<span style="color: #007935 !important">\\(Y^{w}_{i1}\\)</span>'
+  ), 
+  fillContainer = FALSE, options = list(pageLength = 10,
+                                       lengthChange = FALSE,
+                                       searching = FALSE), escape = FALSE) %>% 
+  DT::formatStyle(0, color = '#e64173')
+
+
+
+
+```
+]
+]
+
+
+---
+# But Why Did We Just Spent So Much Time on This?
+
+- Bad Controls are a very important topic for several reasons: 
+
+  1. Even thought is fairly simple (after you understand it!) it is a fairly new development in econometrics, and its great to see how we continue to learn new (simple and useful) things. 
+  
+--
+  2. To improve our causal identification correcting flawed analysis (this what we have been doing throughout this course). When analysts/researchers or commentators disregards or are indifferent to such flaws, they are supporting or spreading BS. 
+  
+--
+  3. Last but not least it will help us uncover the BS in a important policy debate... 
+  
+---
+background-image: url("Images/paygap_bs.jpg")
+background-size: 40%
+background-position: 90% 30%
+count:true
+# Example: Debate on the Gender Pay Gap
+
+.font80[
+.pull-left[
+
+- Interviewer brings up the point that the gender pay gap in the UK is 9% as evidence that modern society is still primarily dominated by men. Her point is that gender **causes** a wage differential.
+- Interviewee response:
+    - "Multivariate analysis of the pay gap indicates that it doesn't exist"
+    - "If you are a social scientist word your salt, you never do a univariate analysis [...]. You break it down by age, by occupation, interest, personality [and the gap disappears]"
+]
+]
+.right[  
+[Video here](https://youtu.be/aMcjxSThD54?t=321)
+]
+
+
+---
+background-image: url("Images/paygap_bs.jpg")
+background-size: 20%
+background-position: 100% 00%
+count:true
+# .font90[BS in The Argument That There is No Gender Wage Gap]
+
+- This course has given us the tools to clearly defined all the pieces   
+a policy debates like this one.   
+
+--
+- First, we identify all the elements, then we can clearly see where   
+is the BS component.   
+
+--
+- Original statement  
+
+--
+- Commentators critique: 
+    - multivariate
+    - OVB  
+    
+--
+- Can you point to where is the problem with?  
+
+--
+- In addition to this point another likely point of BS has to do with the auxiliary and long regression in OVB for personality.   
+
+--
+- Why are we calling it BS and not wrong? Or a lie?
+
+
+---
+count:true
+# .font80[BS in The Argument That There is No Gender Wage Gap. Notes 1/2]
+
+
+- Original statement: 
+  - In English: the disproportionate domination of men in modern societies can be seen in the fact that gender causes a negative and substantial wage differential between men and women. 
+  - Using expectations and PO, and defining the treatment $(D_i)$ as one if the individual's gender is female and zero if men: $\mathop{\mathbb{E}}(lnY_i|D_i = 1)  -  \mathop{\mathbb{E}}(lnY_i|D_i = 0) = - 0.09 + \underbrace{\mathop{\mathbb{E}}(lnY_{i0} | D_i = 1) - \mathop{\mathbb{E}}(lnY_{i0} | D_i = 0)}_\text{Selection bias}$ assuming $\text{Selection Bias} = 0$ 
+  - Using regression: $lnY_i = \alpha -0.09D_i + e_i$. With the assumption that there is no OVB.
+
+
+---
+count:true
+# .font70[BS in The Argument That There is No Gender Wage Gap. Notes 2/2]
+.font70[
+- Commentator's critique: 
+    - In English: the cited gap does not compare indivuals of similar age, occupation, personality and interests. 
+    - In regression terms: the cited gap comes from a regressor that fails to controls for several variables leading to OVB. 
+    - For example, let's focus on the effect of excluding personality: 
+
+$$
+\begin{aligned}
+\text{long: } \quad &lnY_i  = \alpha^l + \beta^l D_i + \gamma P_i + e^l_i\\
+\text{aux: } \quad &P_i  = \pi_0 + \pi_1 D_i + u_i\\
+\text{OVB: }  \quad    &\beta^s - \beta^l  = \pi_1 \gamma
+\end{aligned}
+$$
+- Following the commentators rationale (from the domain of psychology), that women tend to be more agreeable than men: $\pi_1>0$
+- And another rationale (from the domain of economics) that jobs with higher agreeableness tend to have lower wages: $\gamma<0$
+- Lead us to conclude that OVB is negative, which means that $\beta^s - \beta^l$. Given that $\beta^s<0$, this means that the true causal difference is lower (closer to zero).
+
+]
+---
+# .font80[BS in The Argument That There is No Gender Wage Gap. Notes 3/3]
+.font80[
+- In addition to this point another likely point of BS has to do with the auxiliary regression in OVB for personality. 
+  - This point is that his statement regarding $\pi_1>0$ are probably well grounded on research given his field of expertise. $\gamma<0$ on the other hand requires expertise in personality and labor economics. And give that it is pretty hard to measure how personality traits affect earnings, we should be much more skeptical of the argument for $\gamma$ (made with the same confidence as the first one, but probably reaching outside of field of expertise).
+
+- Why are we calling it BS and not just wrong? Or a lie?
+  - There is no reason to believe the commentator is lying. He does however, demonstrate a lack of interest towards the truth as explained above. He probably doesn't care about bad controls and how this might weakens his desired result (of no gender gap). This lack of interests about the truth, plus the fact that he is reaching out of his field of expertise are the two key characteristics that Frankfurt identify behind BS. 
+]
+
+
+
+
+
+
+---
+# Acknowledgments
+
+
+
+
+- MM
+
+
+```{r gen_pdf, include = FALSE, cache = FALSE, eval = TRUE}
+pagedown::chrome_print("25_last_p1.html", output = "25_last_p1.pdf")
+```

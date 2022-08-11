@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Ec140 - Variance and Sampling</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Fernando Hoces la Guardia" />
+    <meta name="date" content="2022-06-27" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <script src="libs/jquery/jquery-3.6.0.min.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Ec140 - Variance and Sampling
+### Fernando Hoces la Guardia
+### 06/27/2022
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-slide-content {
+    font-size: 30px;
+    padding: 1em 1em 1em 1em;
+}
+&lt;/style&gt;
+
+
+
+
+# Housekeeping 
+
+- Updated Syllabus
+  - Fixed dates on PS1. Due this Friday 5pm on gradescope. 
+  
+- Unofficial Course Capture! (second attempt!)
+
+- Finish Ch 1 of MM by the end of the week. 
+
+
+
+
+---
+count:true
+
+# Todays Lecture 
+
+- Variance and Standard Deviation
+
+- Expectation and Standard Deviation of the Sample Mean
+
+- Law of Large Numbers, Central Limit Theorem, and Sampling
+
+
+---
+count:true
+
+# Variance and Standard Deviation 1/N (Sample)
+
+.font80[
+.pull-left[
+- Random variables -&gt; probabilities -&gt; distributions -&gt; data -&gt; mean/expectation
+
+- Let's look at another data set:  
+
+
+
+
+
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-f01dbb7db068027cf2c7" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f01dbb7db068027cf2c7">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[90,96,96,97,93,94,93,55]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>Harry Potter Movies (\\(X\\))<\/th>\n      <th>Game of Thrones Seasons (\\(Y\\))<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+]
+
+]
+
+---
+count:true
+
+# Variance and Standard Deviation 1/N (Sample)
+.font80[
+.pull-left[
+- Random variables -&gt; probabilities -&gt; distributions -&gt; data -&gt; mean/expectation
+
+- Let's look at another data set:  
+
+
+
+
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+- Based on this data set, which one should we watch?
+
+- In addition to the mean, what other summary statistic (from data to one number) would you like to communicate. 
+
+- Lets draw the data
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-7d1fd31143675978436b" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7d1fd31143675978436b">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[90,96,96,97,93,94,93,55]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>Harry Potter Movies (\\(X\\))<\/th>\n      <th>Game of Thrones Seasons (\\(Y\\))<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+]
+
+]
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+]
+
+]
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-5209e84ba882b8260500" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5209e84ba882b8260500">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[90,96,96,97,93,94,93,55]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>Harry Potter Movies (\\(X\\))<\/th>\n      <th>Game of Thrones Seasons (\\(Y\\))<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+]
+
+]
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+]
+
+]
+
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-0e14547b6fd9087b30bd" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0e14547b6fd9087b30bd">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\\(Y - \\overline{Y}\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+
+]
+
+]
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-34556486bf9f4d7df50b" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-34556486bf9f4d7df50b">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\\(Y - \\overline{Y}\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+
+]
+
+]
+
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = ? \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = ?
+\end{equation}`
+$$
+
+]
+
+]
+
+
+
+---
+count:true
+
+# Variance and Standard Deviation 2/N (Sample)
+
+
+.font80[
+
+.pull-right[
+
+<div id="htmlwidget-f9bbe801c233e3f050c4" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f9bbe801c233e3f050c4">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\\(Y - \\overline{Y}\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+
+]
+
+]
+
+
+
+.font80[
+.pull-left[
+
+
+
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+
+$$
+`\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = 0 \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = 0
+\end{equation}`
+$$
+
+]
+
+]
+
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = 0 \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = 0
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+<div id="htmlwidget-6640cdb3a34870eeaccc" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6640cdb3a34870eeaccc">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[12.25,2.25,30.25,12.25,42.25,2.25,56.25,132.25],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25],[0.5625,45.5625,45.5625,60.0625,14.0625,22.5625,14.0625,1173.0625]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\n                      \\(Y - \\overline{Y}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right) }{8} = 0 \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right) }{8} = 0
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} = 171.9
+\end{equation}`
+$$
+
+
+
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+<div id="htmlwidget-98a3579e65e337b7d3c6" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98a3579e65e337b7d3c6">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[12.25,2.25,30.25,12.25,42.25,2.25,56.25,132.25],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25],[0.5625,45.5625,45.5625,60.0625,14.0625,22.5625,14.0625,1173.0625]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\n                      \\(Y - \\overline{Y}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+.font150[
+
+- These represent the sample variances of HP and GoT ratings
+- But what about the units?
+
+]
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 2/N (Sample)
+
+
+
+.font80[
+.pull-left[
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+s^{2}_{Y} = \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} = 171.9
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s_{X} = \sqrt{ \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} } = 6 \\
+s_{Y} = \sqrt{ \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8} } = 13.1
+\end{equation}`
+$$
+
+
+
+
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+<div id="htmlwidget-5ac8ee63cbd301776d4a" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5ac8ee63cbd301776d4a">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[12.25,2.25,30.25,12.25,42.25,2.25,56.25,132.25],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25],[0.5625,45.5625,45.5625,60.0625,14.0625,22.5625,14.0625,1173.0625]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\n                      \\(Y - \\overline{Y}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+.font150[
+- Due to a minor technicality we divide by `\(N-1\)` instead of `\(N\)` (not relevant for the course).
+- `\(s^{2}_{X}\)` and `\(s_{X}\)` correspond to the sample variance and sample standard deviation of a random variable `\(X\)`.
+
+]
+]
+
+]
+
+---
+count: true
+# Variance and Standard Deviation 2/N (Sample)
+
+.font80[
+.pull-left[
+
+$$
+`\begin{equation}
+\overline{X} = 84.5 \\
+\overline{Y} = 89.2
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8- 1} = 41.4 \\
+s^{2}_{Y} = \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8 - 1} = 196.5
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s_{X} = \sqrt{ \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8 - 1} } = 6.4 \\
+s_{Y} = \sqrt{ \frac{ \sum_{1:8}\left( y - \overline{Y} \right)^2 }{8 - 1} } = 14
+\end{equation}`
+$$
+
+
+
+]
+
+
+
+]
+
+
+
+
+.font50[
+
+.pull-right[
+
+<div id="htmlwidget-7b3b39b6f4a249b894bd" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7b3b39b6f4a249b894bd">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rotten Tomatos Scores<\/caption>","data":[[1,2,3,4,5,6,7,8],[81,83,90,88,78,83,77,96],[-3.5,-1.5,5.5,3.5,-6.5,-1.5,-7.5,11.5],[12.25,2.25,30.25,12.25,42.25,2.25,56.25,132.25],[90,96,96,97,93,94,93,55],[0.75,6.75,6.75,7.75,3.75,4.75,3.75,-34.25],[0.5625,45.5625,45.5625,60.0625,14.0625,22.5625,14.0625,1173.0625]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(X\\)<\/th>\n      <th>\\(X - \\overline{X}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n      <th>\\(Y\\)<\/th>\n      <th>\n                      \\(Y - \\overline{Y}\\)<\/th>\n      <th>\\( (X - \\overline{X})^2 \\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+.font150[
+- Due to a minor technicality we divide by `\(N-1\)` instead of `\(N\)` (not relevant for the course).
+- `\(s^{2}_{X}\)` and `\(s_{X}\)` correspond to the sample variance and standard deviation.
+
+]
+
+]
+
+]
+
+
+---
+# Variance and Standard Deviation 3/N (Population)
+
+Let's focus on the formula for mean and sample variance of Harry Potter only. And for now, I will continue use `\(N\)` (8) in the denominator for the variane to illustrate the following concept.  
+
+
+
+.font90[
+.pull-left[
+
+$$
+`\begin{equation}
+ \overline{X} = \frac{ \sum_{1:8}{x} }{8} = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font80[
+
+.pull-right[
+
+]
+
+]
+
+
+
+
+
+---
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{  \overline{X} = \frac{ \sum_{1:8}{x} }{8} } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+
+]
+
+]
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+]
+
+]
+
+
+
+---
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+     \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8}   
+ } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+
+
+
+
+]
+
+]
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}`
+$$
+
+
+
+]
+
+]
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} = \frac{ \sum_{1:8}\left( x - \overline{X} \right)^2 }{8} 
+} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}`
+$$
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } = 84.5 \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} = \frac{ \sum_{1:8} g(x) }{8} 
+} = 36.2 \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}`
+$$
+
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} =  \frac{ \sum_{1:8}{g(x)} }{8} = \sum_{1:8} g(x)  \frac{1}{8} = \\   \sum_{1:8} g(x) \times prop(x) 
+}  \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+--
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( g(x) \right)  = \\
+  \mathop{\mathbb{E}}\left( (X - \overline{X})^2 \right) = \sum_{x} (x - E(X))^2 f(x)
+  }\\
+\end{equation}`
+$$
+
+
+]
+
+]
+
+
+---
+count:true
+# Variance and Standard Deviation 4/N (Population)
+
+
+.font90[
+.pull-left[
+
+.center[ Sample ]
+
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \overline{X}  =  \frac{ \sum_{1:8}{x} }{8} = \sum_{1:8} x  \frac{1}{8} = \\
+  \sum_{1:8} x \times prop(x) 
+ } \\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+\color{#007935}{ 
+s^{2}_{X} =  \frac{ \sum_{1:8}{g(x)} }{8} = \sum_{1:8} g(x)  \frac{1}{8} = \\   \sum_{1:8} g(x) \times prop(x) 
+}  \\
+\end{equation}`
+$$
+
+
+
+
+]
+
+]
+
+
+
+
+.font90[
+
+.pull-right[
+
+.center[ Population ]
+
+$$
+`\begin{equation}
+ \color{#FD5F00}{ 
+  \mathop{\mathbb{E}}(X)\equiv \sum_{x}x f(x)
+  }\\
+\end{equation}`
+$$
+
+
+$$
+`\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( g(x) \right)  = \\
+  \mathop{\mathbb{E}}\left( (X - E(X))^2 \right) = \sum_{x} (x - E(X))^2 f(x)
+  }\\
+\end{equation}`
+$$
+Usually `\(E(X)\)` is defined as `\(\mu\)`, so you might see: 
+
+$$
+`\begin{equation}
+ \color{#007935}{ 
+  \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) = \sum_{x} (x - \mu)^2 f(x)
+  }\\
+\end{equation}`
+$$
+
+]
+
+]
+
+---
+count:true
+# Variance and Standard Deviation 5/N (Done!)
+You now know what are the variance and standard deviation and where do they come from!
+
+.font200[
+
+$$
+`\begin{equation}
+  Var(X)  = \sigma^2 = \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) \\
+  SD(X)  =  \sigma = \sqrt{ \mathop{\mathbb{E}}\left( ( X - \mu )^2 \right) }
+\end{equation}`
+$$
+
+]
+
+---
+# Variance
+
+Random variables `\(\color{#e64173}{X}\)` and `\(\color{#9370DB}{Y}\)` share the same population mean, but are distributed differently.
+
+&lt;img src="04_sampling_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# Variance
+
+## Rule 1
+
+`\(\mathop{\text{Var}}(X) = 0 \iff X\)` is a constant.
+
+- If a random variable never deviates from its mean, then it has zero variance.
+
+- If a random variable is always equal to its mean, then it's a (not-so-random) constant.
+
+---
+# Variance
+
+## Rule 2
+
+For any constants `\(a\)` and `\(b\)`, `\(\mathop{\text{Var}}(aX + b) = a^2\mathop{\text{Var}}(X)\)`.
+
+--
+
+## Example 
+
+Suppose `\(X\)` is the high temperature in degrees Celsius in Eugene during August. If `\(Y\)` is the temperature in degrees Fahrenheit, then `\(Y = 32 + \frac{9}{5} X\)`. .hi-purple[What is] `\(\color{#9370DB}{\mathop{\text{Var}}(Y)}\)`.hi-purple[?]
+
+--
+
+- `\(\mathop{\text{Var}}(Y) = (\frac{9}{5})^2 \mathop{\text{Var}}(X) = \color{#9370DB}{\frac{81}{25} \mathop{\text{Var}}(X)}\)`.
+
+---
+# Variance
+
+## Variance Rule 3
+
+For constants `\(a\)` and `\(b\)`,
+
+$$
+\mathop{\text{Var}} (aX + bY) = a^2 \mathop{\text{Var}}(X) + b^2 \mathop{\text{Var}}(Y) + 2ab\mathop{\text{Cov}}(X, Y).
+$$
+--
+
+- If `\(X\)` and `\(Y\)` are uncorrelated, then `\(\mathop{\text{Var}} (X + Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)\)`
+
+- If `\(X\)` and `\(Y\)` are uncorrelated, then `\(\mathop{\text{Var}} (X - Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)\)`
+
+
+---
+name:sample-mean
+
+# Expectation and Variance of the Sample Mean
+
+- Time for a subtle, but very important change of focus. 
+
+- Until now we have been talking about the expectation and variance of a random variable. Now we are going to focus on the expectation and variance of the **mean of a collection of random variables**. 
+  - Wait? We talk last class that the expectation is like the mean. So basically you want to focus on the mean of the mean? What do that we even mean (!)?
+  
+- A combination of random variables is also a random variable (e.g., remember how a Binomial random variable was a summation of Bernoullis?). In particular, a summation of random variables `\(Y_1, Y_2, Y_3 ..., Y_n\)` is also a random variable, and the sample size is a constant. Hence, `\(\overline{Y}=\frac{ \sum_{n} Y}{n}\)` is also a random variable. 
+
+---
+# Expectation and Variance of the Sample Mean
+
+- This potentially cofusing, as before we would have one random variable X, from which we would sample a collection of values `\(\{x_1, x_2, ... , x_n \}\)`, and with this we could compute the mean `\(\overline{X}\)`. 
+
+- But now we will have to imagine that we do this sampling multiple times. To help with the transition (and because it will also help with future notation), I will use the letter `\(Y_{\text{number } i}\)` to denote random variable number `\(i\)` (where `\(i\)` is used to represent any given number) or `\(Y_{i}\)` for short.
+
+- Hard to imagine if one sample corresponds to one survey that cost millions of dollars and took months or years to carry out, but think about it as a thought exercise. Believing in the multiverse in this case helps with the thought exercise :)
+
+
+
+---
+# Expectation and Variance of the Sample Mean
+
+
+- Before we start combining random variables, we need to make two important assumptions: **independence** and **identically distributed**. 
+
+- **Independence:** Two (or more) random variables are independent when knowing one random variable provides no information about the value of the other. A bit more formally, if two random variables `\(X\)` and `\(Y\)` are independent, then `\(P(X=x \&amp; Y=y) = P(X=x)P(Y=y)\)`. A nice shorthand is to think of "independence as multiplication". 
+
+- **Identically Distributed:** Two (or more) random variables are identically distributed if they have the same probability distribution (or density) function. As a consequence these random variables have the same expected value, let's call it `\(\mu_{Y}\)`, and standard deviation `\(\sigma_{Y}\)`
+
+- A common abbreviation for this two assumption is to say that a collection of random variables is **i.i.d**
+
+
+
+---
+# Expectation of the Sample Mean
+
+- The expected value of the sample mean `\((\overline{Y})\)` is, at first glance, nothing too surprising: 
+
+$$
+`\begin{equation}
+  \mathop{\mathbb{E}}(\overline{Y}) = \frac{1}{n}\sum \mathop{\mathbb{E}}(Y_i)\\
+  \mathop{\mathbb{E}}(\overline{Y}) = \frac{1}{n}\sum \mu_{Y} = \frac{n \mu_{Y}}{n}\\
+  \mathop{\mathbb{E}}(\overline{Y}) = \mu_Y
+\end{equation}`
+$$
+
+(The first equality comes from Rule 2 and 3 of expectation. The second equality comes from identical means, and the third from summing `\(n\)` times the same constant) 
+
+---
+# The Standard Deviation of the Sample Mean
+
+- The formula for variance and standard deviation of the sample mean `\((\overline{Y})\)` is less straight forward: 
+$$
+Var(\overline{Y}) = \frac{\sigma^{2}_{Y}}{n}
+$$
+
+$$
+SD(\overline{Y}) = \frac{ \sigma_{Y}}{\sqrt{n}}
+$$
+
+- Unlike the expectation of the mean its the standard deviation is not the same as the standard deviation of a single random variable. Moreover, it shrinks (to zero) as the sample size increases. 
+
+---
+# Exact v. Approximate Approches
+
+- We just examine the expectation and variance for the sampling mean `\((\overline{Y})\)` using theoretical properties of `\(E()\)` and `\(Var()\)` this results hold true *regardless* of the sample size `\(n\)`. But at the same time answer to a highly hypothetical question (what is the population mean of the sample mean?). 
+
+- In addition to this "exact" derivation. We can also ask what happens with `\(\overline{Y}\)` when its sample size `\((n)\)` increases. This "approximate" approach is refer to as the asymptotic properties `\(\overline{Y}\)` (but either term is fine). 
+
+- In econometrics we make extensive use of the two following approximations:  
+
+---
+# Law of Large Numbers (LLN)
+
+- Under general conditions, of independence (and finite variance), `\(\overline{Y}\)` will be near its expected value `\((\mu_Y)\)` with arbitrary high probability as `\(n\)` is large `\((\overline{Y} \overset{p}{\to} \mu_{Y})\)`  
+
+&lt;!--
+implications for the real world: 
+- counting 
+- surveying hard questions
+--&gt;
+
+&lt;img src="04_sampling_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+
+- Let's roll some dice in [Seeing Theory](https://seeing-theory.brown.edu/basic-probability/index.html#section2) to get a better idea. 
+
+
+---
+# Law of Large Numbers (LLN): Observations
+
+- In practical terms `\(n\)` doesn't have to be too large. `\(n=25-35\)` tends to be enought. In social sciences we tend to work with much more that. 
+
+
+
+
+- As `\(n\)` grows the standard deviation of the sample mean drops to zero. In the example above: `\(SD(\overline{Y_{10}}) = 0.14\)`, `\(SD(\overline{Y_{100}}) = 0.05\)`, `\(SD(\overline{Y_{1000}}) = 0.02\)`, `\(SD(\overline{Y_{10000}}) = 0\)`.
+
+---
+# Central Limit Theorem (CLT)
+- Under general conditions, of independence (and finite variance), the **distribution** of `\(\overline{Y}\)` is approximately `\(N(\mu_{Y}, \frac{\sigma_{Y}^{2}}{n})\)` as `\(n\)` is large.
+
+- This is true **for any** type of distribution (not only normal) of the underlying `\(Y_{i}\)`. 
+
+- This is very hard to believe, so we are going to spend some significant time in [Seeing Theory](https://seeing-theory.brown.edu/probability-distributions/index.html#section3) simulating different scenarios (and probably over session too). 
+
+- In real life the key assumption is that of independence. If observations are obtained at random, a procedure called *random sampling*,  then independence is achieved.
+
+- Random sampling is necessary so the LLN and CLT can be used. 
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

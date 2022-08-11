@@ -1,0 +1,726 @@
+---
+title: "Ec140 - Regression as Conditional Expectation "
+subtitle: " "
+author: "Fernando Hoces la Guardia"
+date: "07/18/2022"
+output: 
+  xaringan::moon_reader:
+    footer: "These slides available at https://fhoces.github.io/econ140summer2022/"
+    css: [default, metropolis, metropolis-fonts, "my-css.css"] 
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+.remark-slide-content {
+    font-size: 30px;
+    padding: 1em 1em 1em 1em;
+}
+</style>
+
+```{r , include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, 
+       parallel, Ecdat, wooldridge, dslabs, ggforce, emo, png, grid, pander, 
+       countdown, emoGG, haven, broom, ggridges, gridExtra, kableExtra, snakecase, 
+       janitor, data.table, lubridate, lfe, here)
+
+# Define pink color
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#3b3b9a"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+slate <- "#314f4f"
+# Dark slate grey: #314f4f
+
+options(htmltools.dir.version = FALSE)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+
+overwrite = FALSE
+
+
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Notes directory
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -0.5, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_simple <- theme_bw() + theme(
+  line = element_blank(),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text.x = element_text(size = 18, family = "STIXGeneral"),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  # plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes_math <- theme_void() + theme(
+  text = element_text(family = "MathJax_Math"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes_serif <- theme_void() + theme(
+  text = element_text(family = "MathJax_Main"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes <- theme_void() + theme(
+  text = element_text(family = "Fira Sans Book"),
+  axis.title = element_text(size = 18),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = grey_light,
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_set(theme_gray(base_size = 20))
+# Column names for regression results
+reg_columns <- c("Term", "Est.", "S.E.", "t stat.", "p-Value")
+# Function for formatting p values
+format_pvi <- function(pv) {
+  return(ifelse(
+    pv < 0.0001,
+    "<0.0001",
+    round(pv, 4) %>% format(scientific = F)
+  ))
+}
+format_pv <- function(pvs) lapply(X = pvs, FUN = format_pvi) %>% unlist()
+# Tidy regression results table
+tidy_table <- function(x, terms, highlight_row = 1, highlight_color = "black", highlight_bold = T, digits = c(NA, 3, 3, 2, 5), title = NULL) {
+  x %>%
+    tidy() %>%
+    select(1:5) %>%
+    mutate(
+      term = terms,
+      p.value = p.value %>% format_pv()
+    ) %>%
+    kable(
+      col.names = reg_columns,
+      escape = F,
+      digits = digits,
+      caption = title
+    ) %>%
+    kable_styling(font_size = 20) %>%
+    row_spec(1:nrow(tidy(x)), background = "white") %>%
+    row_spec(highlight_row, bold = highlight_bold, color = highlight_color)
+}
+
+
+```
+
+
+
+```{css, echo = F, eval = T}
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+```
+
+
+# Regression Journey
+
+- Regression as Matching on Groups. Ch2 of MM up to page 68 (not included).
+
+- Regression as Line Fitting and Conditional Expectation. Ch2 of MM, Appendix. (Part II today)
+
+- Multiple Regression and Omitted Variable Bias. Ch2 of MM pages 68-79. 
+
+- Regression Inference, Binary Variables and Logarithms. Ch2 of MM, Appendix + others. 
+
+---
+# Regression Journey
+
+- Regression as Matching on Groups. Ch2 of MM up to page 68 (not included).
+
+- **Regression as Line Fitting and Conditional Expectation. Ch2 of MM, Appendix. (Part II today)** 
+
+- Multiple Regression and Omitted Variable Bias. Ch2 of MM pages 68-79. 
+
+- Regression Inference, Binary Variables and Logarithms. Ch2 of MM, Appendix + others. 
+
+
+---
+
+# Regression as Conditional Expectation: Today's Goal
+
+- Similar to line fitting, this topic will be pretty abstract. 
+- In a similar spirit, this material is useful but not essential.  
+- Put limited effort into understanding it (~today’s class +1-4hrs looking at your notes and reading the appendix of Ch2) but if it doesn’t sink in, don’t get discouraged and move forward into the next topic. 
+- For Regression as Conditional Expectations our goals: 
+ 1. Connect the concept of regression with conditional expectations. 
+ 1. Show how regression is a simple difference in means within groups defined by regesssors.  
+- Last mainly theoretical topic of the course!
+ 
+
+---
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - Example
+  - Why should we care about it (regardless of regression)?
+- Connection between CEF and regression.
+- Use CEF to solidify our understanding of how regression as a simple difference in groups, for groups defined by values of regressors.  
+- Application: CEF and Regression With Binary Treatments  
+
+---
+count:false
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - **Definitions**
+  - Example
+  - Why should we care about it (regardless of regression)?
+- Connection between CEF and regression.
+- Use CEF to solidify our understanding of how regression as a simple difference in groups, for groups defined by values of regressors.  
+- Application: CEF and Regression With Binary Treatments  
+
+---
+
+# .font80[Conditional Expectation and Conditional Expectation Function]
+
+- Earlier in the semester we defined the a Conditional Expectation as the population average of one variable, given some value taken by another variable. 
+
+$$
+\begin{equation}
+\mathop{\mathbb{E}}(Y_i|X_i=x)  = \sum_{y}yP(Y_i=y|X_i=x)
+\end{equation}
+$$
+  
+- This average does two things:
+  1. it summarizes the distribution (the data) of $Y_i$, given $x$. 
+  1. it provides information how $Y_i$ changes as we move $x$. It gave us our first way of thinking about associations (before RCTs and regressions!). As a thought exercise, let's think about the distribution of happiness $(Y_i)$ and the result of some sports outcome $(X_i)$ (or other leisurely activity). 
+
+
+---
+# CEF: Definition
+
+- When we look at a CE, we naturally tend to focus on $Y_i$. But if our goal is to describe $Y_i$, the relevant section to vary in the CE its not $Y_i$, its $X_i$. 
+
+- For this reason when we want to use the concept CE to describe the data $(Y_i)$, with one number (the average), across a range of values of $x$, we define the .hi-pink[*Conditional Expectation Function (CEF).*] as the collection of all such CEs (averages). 
+
+.hi-slate[Examples:]
+
+.pull-left[
+- $\mathop{E}\left[ \text{Income}_i \mid \text{Education}_i \right]$
+- $\mathop{E}\left[ \text{Birth weight}_i \mid \text{Air quality}_i \right]$
+]
+
+.pull-right[
+- $\mathop{E}\left[ \text{Wage}_i \mid \text{Gender}_i \right]$
+]
+---
+layout: false
+class: clear, middle
+
+Graphically (From another of [Ed Rubin's Classes](https://github.com/edrubin/EC607S21))...
+---
+name: graphically
+
+# The conditional distributions of $Y_{i}$ for $X_{i}=x$ 
+
+```{R, data_cef, echo = F, cache = T, fig.height = 5}
+# Set seed
+set.seed(12345)
+# Sample size
+n <- 1e4
+# Generate extra disturbances
+u <- sample(-2:2, size = 22, replace = T) * 1e3
+# Generate data
+cef_df <- tibble(
+  x = sample(x = seq(8, 22, 1), size = n, replace = T),
+  y = 15000 + 3000 * x  + 1e3 * (x %% 3) + 500 * (x %% 2) + rnorm(n, sd = 1e4) + u[x]
+) %>% mutate(x = round(x)) %>%
+filter(y > 0)
+# Means
+means_df <- cef_df %>% group_by(x) %>% summarize(y = mean(y))
+# The CEF in ggplot
+gg_cef <- ggplot(data = cef_df, aes(x = y, y = x %>% as.factor())) +
+  geom_density_ridges_gradient(
+    aes(fill = ..x..),
+    rel_min_height = 0.003,
+    color = "white",
+    scale = 2.5,
+    size = 0.3
+  ) +
+  scale_x_continuous(
+    "Annual income",
+    labels = scales::dollar
+  ) +
+  ylab("Years of education") +
+  scale_fill_viridis(option = "magma") +
+  theme_pander(base_family = "Fira Sans Book", base_size = 18) +
+  theme(
+    legend.position = "none"
+  ) +
+  coord_flip()
+```
+
+
+<br>
+
+
+```{R, fig_cef_dist, echo = F, cache = T, fig.height = 5}
+gg_cef
+```
+---
+# The conditional distributions of $Y_{i}$ for $X_{i}=x$ 
+
+The CEF, $\mathop{E}\left[ \text{Y}_{i}\mid \text{X}_{i} \right]$, connects these conditional distributions' means.
+
+```{R, fig_cef, echo = F, cache = T, fig.height = 5}
+gg_cef +
+  geom_path(
+    data = means_df,
+    aes(x = y, y = x %>% as.factor(), group = 1),
+    color = "white",
+    alpha = 0.85
+  ) +
+  geom_point(
+    data = means_df,
+    aes(x = y, y = x %>% as.factor()),
+    color = "white",
+    shape = 16,
+    size = 3.5
+  )
+```
+
+---
+# The conditional distributions of $Y_{i}$ for $X_{i}=x$ 
+
+Focusing in on the CEF, $\mathop{E}\left[ \text{Y}_{i}\mid \text{X}_{i} \right]$...
+
+```{R, fig_cef_only, echo = F, cache = T, fig.height = 5}
+ggplot(data = cef_df, aes(x = y, y = x %>% as.factor())) +
+  geom_density_ridges(
+    rel_min_height = 0.003,
+    color = "grey85",
+    fill = NA,
+    scale = 2.5,
+    size = 0.3
+  ) +
+  scale_x_continuous(
+    "Annual income",
+    labels = scales::dollar
+  ) +
+  ylab("Years of education") +
+  scale_fill_viridis(option = "magma") +
+  theme_pander(base_family = "Fira Sans Book", base_size = 18) +
+  theme(
+    legend.position = "none"
+  ) +
+  geom_path(
+    data = means_df,
+    aes(x = y, y = x %>% as.factor(), group = 1),
+    color = "grey20",
+    alpha = 0.85
+  ) +
+  geom_point(
+    data = means_df,
+    aes(x = y, y = x %>% as.factor()),
+    color = "grey20",
+    shape = 16,
+    size = 3.5
+  ) +
+  coord_flip()
+```
+---
+# The CEF is a Function of One or More Xs
+
+- **The CEF is a function of the variables and values we are conditioning on**. For the expression: 
+$$
+\begin{equation}
+CEF(X_i = x) = \mathop{\mathbb{E}}(Y_i|X_{1i}) =  \mathop{\mathbb{E}}(Y_i|\underbrace{X_{1i}=x}_{\text{this is what varies}}) 
+\end{equation}
+$$
+- In a somewhat confusing convention (to me!), you will usually see that the CEF is presented as the expression in the middle above, in terms of the variable $(X_{1i})$, and not the possible values $(x)$.  
+
+- The next key step is to realize that, the same way we can condition over one variable  $(X_{1i})$, we can condition over many other variables too: 
+
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|X_{1i} = x_1, X_{2i} = x_2,...,  X_{Ki} = x_K,) =  \mathop{\mathbb{E}}(Y_i|X_{1i}, X_{2i}, ..., X_{Ki}) 
+\end{equation}
+$$
+---
+# CEF With Multiple Xs (in English) 1/2
+
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|X_{1i} = x_1, X_{2i} = x_2,...,  X_{Ki} = x_K) =  \mathop{\mathbb{E}}(Y_i|X_{1i}, X_{2i}, ..., X_{Ki}) 
+\end{equation}
+$$
+
+- In the same way $E[Y|X=13]$ can represent the answer to the question “what is the average earning for individuals with 13 years of education?”, we can also ask “what is the average earnings for individuals with 13 years of education, and residing in California?” or $E[Y|X_1=13, X_2=6]$ where 6 represents a numerical code for the state of California. 
+
+- For this case, the CEF would be written as $E[Y|X_1, X_2]$
+
+---
+# CEF With Multiple Xs (in English) 2/2
+
+- As the number of $X's$ grow, it becomes unwieldy notation, hence from now on we use $X$ to refer to "one or more variables", leaving us with a general expression for the CEF: 
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|X) 
+\end{equation}
+$$
+
+- As quick trick to never forget that the CEF depends on $X$ (and not on $Y$), every time you see the expression $\mathop{\mathbb{E}}(Y_i|X)$ replace it in your mind with some function $g(X)$.
+
+
+---
+count:false
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - **Example**
+  - Why should we care about it (regardless of regression)?
+- Connection between CEF and regression.
+- Use CEF to solidify our understanding of how regression as a simple difference in groups, for groups defined by values of regressors.  
+- Application: CEF and Regression With Binary Treatments  
+
+---
+# CEF: Example
+
+- Let's bring this abstract concept down to hearth for the case of private/public colleges. 
+- Before drawing the connection to regression, we can still think of the conditional expectation of our variable of interest ( $Y_i =$ earnings), and how it changes for all our other (explanatory) variables: 
+
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|X) =  \mathop{\mathbb{E}}(Y_i|P_i, GROUP_i, SAT_i, lnPI_i) 
+\end{equation}
+$$
+
+- Where $GROUP_i$ represents the collection of 150 binary variables. 
+- Notice the until now, we have not said anything about the functional form of the CEF, to make it more explicit, let's bring the $g()$ notation: 
+
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|P_i, GROUP_i, SAT_i, lnPI_i)  = g(P_i, GROUP_i, SAT_i, lnPI_i)
+\end{equation}
+$$
+
+---
+count:false
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - Example
+  - **Why should we care about it (regardless of regression)?**
+- Connection between CEF and regression.
+- Use CEF to solidify our understanding of how regression as a simple difference in groups, for groups defined by values of regressors.  
+- Application: CEF and Regression With Binary Treatments  
+
+
+---
+# But Why Should we Care About the CEF? 
+
+- The CEF is good summary of relationship between $Y$ and $X$ because:
+
+  - (Informally) Averages are good ways of summarizing random variables (and $Y|X$ is a RV)  
+  - (Formally) The CEF is the best predictor of $Y|X$ in the sense that it solves the Minimum Mean Squared Error (MMSE) problem $(\arg \min_{m(X)}\{E(Y-m(X)^2\})$. In English: given X, our best guess about $Y$, defined as the one that will render the smallest mistake, will be its CEF. 
+  
+  - This last point sounds similar to regression, but up to this point we have not run any regressions!
+
+---
+count:false
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - Example
+  - Why should we care about it (regardless of regression)?
+- **Connection between CEF and regression.**
+- Use CEF to solidify our understanding of how regression as a simple difference in groups, for groups defined by values of regressors.  
+- Application: CEF and Regression With Binary Treatments  
+
+---
+# Connection Between CEF and Regression 1/4
+- Today we have seen that the CEF is good for summarizing relationships in the data
+- Before today we have also see that Regression provides simple and powerful insights about relationships in the data
+
+- Let’s connect the two. 
+
+- Here we focus on the regression estimates for the population (remember we can think of regression as minimizing a population or a sample problem). This parameters correspond to: 
+$$
+\begin{equation}
+ \{\alpha, \beta\} = \arg \min_{a,b} \left\{ 
+  \mathop{\mathbb{E}}[(Y_i - a - b X_i)^2]
+  \right\}
+\end{equation}
+$$
+- Let's re-write that expression allowing for more regressors
+---
+# Connection Between CEF and Regression 2/4
+
+
+- Now we are allowing to have more than one regressor, so let's redefine $\beta$ as the collection of all parameters that solve the minimization (what before was $\alpha, \beta, \delta, \gamma, ...$ ), and $X$ as the collection of all regressors. This allows us to write the above expression in a more compact way (representing more regressors!): 
+$$
+\begin{equation}
+ \beta = \arg \min_{b} \left\{ 
+  \mathop{\mathbb{E}}[(Y_i - X_ib)^2]
+  \right\}
+\end{equation}
+$$
+
+(as we increase the number of regressors the minimization requires linear algebra in addition to calculus. This is the solution of OLS with multiple variables: $\beta = \mathop{E}\left[ \text{X}_{i} \text{X}_{i}' \right]^{-1} \mathop{E}\left[ \text{X}_{i} \text{Y}_{i} \right]$ where each element represents matrices of different dimensions. This expression is the matrix version of $\beta = \frac{Cov(X_i, Y_i)}{Var(X_i)}$  and of $\alpha = \mathop{\mathbb{E}}[Y_i] - b\mathop{\mathbb{E}}[X_i]$  combined!)
+
+---
+# Connection Between CEF and Regression 3/4
+
+- Basic claim connecting CEF and Regression: if you we interested in the CEF (as summary of relationships), we should be interested in the coefficients that solve the regression (minimization) problem. 
+
+- Let review two properties to support this claim: 
+
+- **Property 1**: If the CEF is linear, a regression estimation (minimization) will obtain the CEF parameters (“If the CEF is linear, regression will find it”). But linearity of CEF is a strong assumption, CEF is linear when underlying data is normal, this is not very common. Using MM words: “If the CEF is linear, regression will find it”.
+
+
+---
+# Connection Between CEF and Regression 4/4
+
+- **Property 2:** If the CEF is not linear, regression estimates will find the best linear approximation to the CEF in the sense that the regression coefficients will be the solution to a minimization problem with respect to $\mathop{\mathbb{E}}[Y_i|X]$, which is different from $Y_i$ $(\arg \min_{b}(E( \mathop{\mathbb{E}}[Y_i|X] - X’b )^2)$. Using MM words: "If the CEF is not linear, regression finds a good approximation to it". 
+
+- (if you are interested in the proofs for these check [this slides](https://raw.githack.com/edrubin/EC607S21/master/notes-lecture/03-why-regression/03-why-regression.html#38), it all starts from the LIE, or Adam's Law!)
+
+- Let's go back to our example to see this properties in practice. 
+
+
+
+---
+# Connection Between CEF and Regression 5/4
+
+- We define the CEF for the private/public example as follows: 
+
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(Y_i|P_i, GROUP_i, SAT_i, lnPI_i)  = g(P_i, GROUP_i, SAT_i, lnPI_i)
+\end{equation}
+$$
+- Now, to explore property 1, we will **assume** that the CEF of $lnY_i$ is linear in X's: 
+$$
+\begin{equation}
+ \mathop{\mathbb{E}}(ln Y_i|X) =  \theta_1 + \theta_2 P_i +\sum_{j=1}^{150} \theta_{3,j} GROUP_{ji} + \theta_4 SAT + \theta_4 ln PI_{i}
+\end{equation}
+$$
+- What *property 1* tells us is that in this case, the OLS regression for $\beta$ (define as the collection of all parameters) will produce as result the *same* parameters of the CEF above (i.e, $\beta = \theta$ ).
+
+
+
+---
+# Connection Between CEF and Regression 6/6
+
+- However, linearity can be a strong assumption for the CEF. Here is where property 2 strengthen the connection between CEF and regression. 
+
+- Going back the CEF being any kind of function $g()$, not necessarily linear. Property 2, says that the estimate from the linear regression will provide a good approximation to the this CEF. 
+
+- Final comment regarding the connection between regression and CEF: they are connected, but they are not the same. Whenever you see an expression for $\mathop{\mathbb{E}}(ln Y_i|X)$ that looks very similar to $ln Y_i$ remember that the former is an average of the later. 
+
+---
+count:false
+
+# Regression as Conditional Expectation: Outline
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - Example
+  - Why should we care about it (regardless of regression)?
+- Connection between CEF and regression.
+- **Use CEF to solidify our understanding of how regression is a simple difference in groups, for groups defined by values of regressors.**  
+- Application: CEF and Regression With Binary Treatments  
+
+
+
+---
+background-image: url("Images/MMtbl22_emphA.png"), url("Images/MMtbl22_emphB.png")
+background-size: 50%, 50%
+background-position: 100% 15%, 100% 85%
+# Back to Regression as Matching
+.pull-left[
+
+- Now we can look the regression output from Regression as Matching and interpret coefficient of interest as an estimate of $\beta$, an approximation to the difference between to conditional expectations: 
+$$
+\begin{equation}
+\beta = \mathop{\mathbb{E}}(Y_i|P_i = 1, X_{-P})  - \mathop{\mathbb{E}}(Y_i|P_i = 0, X_{-P})
+\end{equation}
+$$
+- Where we have replace $GROUP_i, SAT_i, lnPI_i$ with $X_{-P}$ to simplify notation.
+]
+
+---
+background-image: url("Images/MMtbl22_emphA.png"), url("Images/MMtbl22_emphB.png")
+background-size: 50%, 50%
+background-position: 100% 15%, 100% 85%
+# Back to Regression as Matching
+.pull-left[
+
+$$
+\begin{aligned}
+\beta = \mathop{\mathbb{E}}(Y_i|P_i = 1, X_{-P})  - \\
+\mathop{\mathbb{E}}(Y_i|P_i = 0, X_{-P})
+\end{aligned}
+$$
+
+- Notice that the right hand side **is** a difference between groups, where each group is has the same characteristics (given by $X_{-P}$ )
+- Given properties 1 and 2, this equality will hold if we assume a linear CEF, or it will be a good approximation even if the CEF is not linear. 
+]
+
+---
+count: false
+
+- Conditional Expectation and the Conditional Expectation Function (CEF).
+  - Definitions
+  - Example
+  - Why should we care about it (regardless of regression)?
+- Connection between CEF and regression.
+- Use CEF to solidify our understanding of how regression is a simple difference in groups, for groups defined by values of regressors. 
+- **Application: CEF and Regression With Binary Treatments**  
+
+---
+# .font80[CEF and Regression With Binnay Treaments as Single Regressor 1/3]
+
+- The CEF for $Y_i$ conditioning only on a binary variable $Z_i$ can take only two values: 
+$$
+\begin{equation}
+\mathop{\mathbb{E}}(Y_i|Z_i) = 
+  \begin{cases}
+    \mathop{\mathbb{E}}(Y_i|Z_i = 0)\\
+    \mathop{\mathbb{E}}(Y_i|Z_i = 1)
+  \end{cases}
+\end{equation}
+$$
+- Given this, we can write the CEF as a function of this two CEs: 
+
+$$
+\begin{aligned}
+\mathop{\mathbb{E}}(Y_i|Z_i) &= (1 - Z_i) \mathop{\mathbb{E}}(Y_i|Z_i = 0) + Z_i  \mathop{\mathbb{E}}(Y_i|Z_i = 1)\\
+&=  \underbrace{\mathop{\mathbb{E}}(Y_i|Z_i = 0)}_{\theta_1}+ Z_i \underbrace{( \mathop{\mathbb{E}}(Y_i|Z_i = 1) -  \mathop{\mathbb{E}}(Y_i|Z_i = 0))}_{\theta_2}\\
+&=  \theta_1 + \theta_2 Z_i
+\end{aligned}
+$$
+---
+# .font80[CEF and Regression With Binnay Treaments as Single Regressor 2/3]
+
+- Hence, we just prove that the CEF for this particular case (one binary conditioning variable) is linear.
+
+- Now we can invoke property 2 of CEF and regression, and we have that a regression that estimates the following equation: 
+
+$$
+\begin{equation}
+Y_i = \alpha + \beta Z_i + e_i
+\end{equation}
+$$
+
+- Will estimate coefficients that corresponds to the CEF $(\alpha = \theta_1, \beta = \theta_2)$.
+
+---
+# .font80[CEF and Regression With Binnay Treaments as Single Regressor 3/3]
+- Moreover, the estimate for $\beta$ in a regression, will correspond to the difference in CEs:
+
+$$
+\begin{equation}
+\beta = \mathop{\mathbb{E}}(Y_i|Z_i = 1) -  \mathop{\mathbb{E}}(Y_i|Z_i = 0)
+\end{equation}
+$$
+- This is why we can write simple difference in groups in regression form!
+
+
+---
+# Acknowledgments
+
+.pull-left[
+- [Ed Rubin's Graduate Econometrics](https://github.com/edrubin/EC607S21)
+- MM
+]
+.pull-right[
+
+]
+
+
+```{r gen_pdf, include = FALSE, cache = FALSE, eval = TRUE}
+pagedown::chrome_print("14_reg_ce_mult.html", output = "14_reg_ce_mult.pdf")
+```
