@@ -12,7 +12,7 @@ output:
 
 -   Instructor: Fernando Hoces de la Guardia ([fhoces\@berkeley.edu](mailto:fhoces@berkeley.edu))
 
--   Graduate Student Instructors: Yige Wang ([yigewang\@berkeley.edu](mailto:yigewang@berkeley.edu)) and Elena Stacy ([estacy\@berkeley.edu](mailto:estacy@berkeley.edu))
+-   Graduate Student Instructors: Yige Wang and Elena Stacy 
 
 -   Class Meeting Times: MTWTh 8am - 9:30am \@ Dwinelle Hall 145
 
@@ -23,9 +23,9 @@ output:
 
 -   Office Hours:
 
-    -   FH: M 9:45-11:45 & W 9:45 - 10:45 \@ 517 Evans and Zoom (<https://berkeley.zoom.us/j/3018730303>). 
-    -   ES: T & Th from 12:30-1:30pm \@ Evans 626 and Zoom (https://berkeley.zoom.us/j/3592976499).
-    -   YW: M & W 11:30am to 1:30pm \@ Evans 542 and Zoom (https://berkeley.zoom.us/j/93553122598).
+    -   FH: M 9:45-11:45 & W 9:45 - 10:45 \@ 517 Evans 
+    -   ES: T & Th from 12:30-1:30pm \@ Evans 626 
+    -   YW: M & W 11:30am to 1:30pm \@ Evans 542 
 
 -   Enrollment: Please see the Economics Department Head GSI, John Wieselthier (548 Evans, [headgsi\@econ.berkeley.edu](mailto:headgsi@econ.berkeley.edu)), for ALL questions regarding enrollment.
 
